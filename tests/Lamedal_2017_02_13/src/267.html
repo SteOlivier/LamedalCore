@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\types\list\list_find.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.zz;
+
+namespace LamedalCore.Types.List
+{
+    /// &lt;summary&gt;
+    ///  Generic list methods
+    /// &lt;/summary&gt;
+    /// &lt;remarks&gt;IgnoreGroup&lt;/remarks&gt;
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action, GroupName = &quot;Generic&quot;, IgnoreGroup = true)]
+    public sealed class List_Find
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance; // system library
+
+        /// &lt;summary&gt;Tests if two lists are equal.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;list1&quot;&gt;The list1.&lt;/param&gt;
+        /// &lt;param name=&quot;list2&quot;&gt;The list2.&lt;/param&gt;
+        /// &lt;param name=&quot;equalItems&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [equal items].&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool Contains&lt;T&gt;(IList&lt;T&gt; list1, IList&lt;T&gt; list2, bool equalItems = false)
+        {
+            string errorMsg;
+            return Contains(list1, list2, out errorMsg, equalItems);
+        }
+
+        ///// &lt;summary&gt;Searches for a value withing an array.&lt;/summary&gt;
+        ///// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        ///// &lt;param name=&quot;list2Search&quot;&gt;The array.&lt;/param&gt;
+        ///// &lt;param name=&quot;searchValue&quot;&gt;The search value.&lt;/param&gt;
+        ///// &lt;param name=&quot;ignoreCase&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [ignore case].&lt;/param&gt;
+        ///// &lt;returns&gt;&lt;/returns&gt;
+        ///// &lt;code&gt;Recall&lt;/code&gt;
+        //public bool Contains&lt;T&gt;(IList&lt;T&gt; list2Search, T searchValue, bool ignoreCase = false)
+        //{
+        //    if (searchValue is string)
+        //    {
+        //        var valueTest = searchValue.ToString().Trim();
+        //        if (ignoreCase) valueTest = valueTest.ToLower();
+        //        foreach (var item in list2Search)
+        //        {
+        //            var value = (ignoreCase) ? item.ToString().Trim().ToLower() : item.ToString().Trim();
+        //            if (value.Contains(valueTest)) return true;  //-----------------------------------------------
+        //        }
+        //    }
+        //    else
+        //    {
+        //        foreach (var item in list2Search)
+        //        {
+        //            if (item.Equals(searchValue)) return true;  // ---------------------------
+        //        }
+        //    }
+        //    return false;
+        //}
+
+        /// &lt;summary&gt;Tests if two lists have equal values. The order of the values need not be the same&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;list1&quot;&gt;The list1.&lt;/param&gt;
+        /// &lt;param name=&quot;list2&quot;&gt;The list2.&lt;/param&gt;
+        /// &lt;param name=&quot;equalItems&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [equal items].&lt;/param&gt;
+        /// &lt;param name=&quot;errorMsg&quot;&gt;The error MSG.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool Contains&lt;T&gt;(IList&lt;T&gt; list1, IList&lt;T&gt; list2, out string errorMsg, bool equalItems = false)
+        {
+            var result = true;
+            errorMsg = &quot;&quot;;
+            if (list1 == null &amp;&amp; list2 == null) return true;
+            if (list1 == null) return false;
+            if (list2 == null) return false;
+
+            if (equalItems &amp; list1.Count != list2.Count)
+            {
+                errorMsg = $&quot;Error! List1.Count = {list1.Count}; List2.Count = {list2.Count} ({list1.Count} != {list2.Count})&quot;.NL();
+                result = false;
+            }
+
+            var list1Hash = new HashSet&lt;T&gt;(list1);
+            for (var ii = 0; ii &lt; list2.Count; ii++)
+            {
+                var value = list2[ii];
+                if (list1Hash.Contains(value) == false)
+                {
+                    var value1 = list1[ii] as string;
+                    var value2 = list2[ii] as string;
+                    int index;
+                    string err1;
+                    _lamed.Types.String.Search.Equal_(value1, value2, out err1, out index);
+                    errorMsg += &quot;Error! No match found at index = &quot; + ii + &quot;.&quot;.NL() + err1;
+                    result = false;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        /// &lt;summary&gt;Tests if two lists are exactly the same. Order of elements must also match.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;list1&quot;&gt;The list1.&lt;/param&gt;
+        /// &lt;param name=&quot;list2&quot;&gt;The list2.&lt;/param&gt;
+        /// &lt;param name=&quot;errorMsg&quot;&gt;The error MSG.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool Identical&lt;T&gt;(IList&lt;T&gt; list1, IList&lt;T&gt; list2, out string errorMsg) where T : IComparable
+        {
+            errorMsg = &quot;&quot;;
+            if (list1 == null &amp;&amp; list2 == null) return true;
+            if (list1 == null) return false;
+            if (list2 == null) return false;
+
+            if (list1.Count != list2.Count) errorMsg = $&quot;Error! Item counts mismatch {list1.Count} != {list2.Count}.&quot;.NL();
+            T value1 = _lamed.Types.Object.DefaultValue&lt;T&gt;();
+
+            for (var ii = 0; ii &lt; list2.Count; ii++)
+            {
+                if (ii &lt; list1.Count) value1 = list1[ii];
+                var value2 = list2[ii];
+                if (value1.CompareTo(value2) != 0 )
+                {
+                    int index;
+                    string errMsg1;
+                    _lamed.Types.String.Search.Equal_(value1.ToString(), value2.ToString(), out errMsg1, out index);
+                    errorMsg += &quot;Error! No match found at index = &quot; + ii + &quot;.&quot;.NL() + errMsg1;
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// &lt;summary&gt;Tests if two lists are exactly the same. Order of elements must also match.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;list1&quot;&gt;The list1.&lt;/param&gt;
+        /// &lt;param name=&quot;list2&quot;&gt;The list2.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool Identical&lt;T&gt;(IList&lt;T&gt; list1, IList&lt;T&gt; list2) where T : IComparable
+        {
+            string errorMsg;
+            return Identical(list1, list2, out errorMsg);
+        }
+
+        /// &lt;summary&gt;Searches for a value withing an array.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;arrayToSearch&quot;&gt;The array.&lt;/param&gt;
+        /// &lt;param name=&quot;searchValue&quot;&gt;The search value.&lt;/param&gt;
+        /// &lt;param name=&quot;ignoreCase&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [ignore case].&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        /// &lt;code&gt;Recall&lt;/code&gt;
+        public bool In&lt;T&gt;(IList&lt;T&gt; arrayToSearch, T searchValue, bool ignoreCase = false)
+        {
+            if (searchValue is string)
+            {
+                var valueTest = searchValue.ToString().Trim();
+                if (ignoreCase) valueTest = valueTest.ToLower();
+                foreach (var item in arrayToSearch)
+                {
+                    var value = (ignoreCase) ? item.ToString().Trim().ToLower() : item.ToString().Trim();
+                    if (value == valueTest) return true;  //-----------------------------------------------
+                }
+            }
+            else
+            {
+                foreach (var item in arrayToSearch)
+                {
+                    if (item.Equals(searchValue)) return true;  // ---------------------------
+                }
+            }
+            return false;
+        }
+
+        /// &lt;summary&gt;Return true if findValues is contained in list.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;list&quot;&gt;The list.&lt;/param&gt;
+        /// &lt;param name=&quot;findValues&quot;&gt;The find values.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool In&lt;T&gt;(IList&lt;T&gt; list, params T[] findValues)
+        {
+            foreach (T value in findValues)
+            {
+                var result = _lamed.Types.List.Find.In(list, value);
+                if (result == false) return false;
+            }
+            return true;
+        }
+
+        /// &lt;summary&gt;Determines whether the source value is in the compare values.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;findValue&quot;&gt;The value to find&lt;/param&gt;
+        /// &lt;param name=&quot;ignoreCase&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [ignore case].&lt;/param&gt;
+        /// &lt;param name=&quot;list&quot;&gt;The compare values optional array&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        /// &lt;exception cref=&quot;System.ArgumentNullException&quot;&gt;findValue&lt;/exception&gt;
+        public bool In&lt;T&gt;(T findValue, bool ignoreCase = false, params T[] list)
+        {
+            if (findValue == null) throw new ArgumentNullException(nameof(findValue));
+
+            return In(list, findValue, ignoreCase);
+        }
+
+        /// &lt;summary&gt;
+        /// Searches for a value in an array.
+        /// &lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;array&quot;&gt;The array.&lt;/param&gt;
+        /// &lt;param name=&quot;searchValue&quot;&gt;The search value.&lt;/param&gt;
+        /// &lt;param name=&quot;Index&quot;&gt;The index.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool Index_OfValue&lt;T&gt;(IList&lt;T&gt; array, T searchValue, out int Index)
+        {
+            Index = array.IndexOf(searchValue);
+            return (Index != -1);
+        }
+
+        /// &lt;summary&gt;Determines whether list [is null or empty].&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;list&quot;&gt;The list.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool IsNullOrEmpty&lt;T&gt;(ICollection&lt;T&gt; list)
+        {
+            return list == null || list.Count == 0;
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[112,49,112,61,0],[113,32,113,45,0],[114,32,114,45,0],[199,36,199,87,0],[29,9,29,10,1],[31,13,31,69,1],[32,9,32,10,1],[71,9,71,10,1],[72,13,72,31,1],[73,13,73,27,1],[74,13,74,48,1],[74,49,74,61,1],[75,13,75,31,1],[75,32,75,45,1],[76,13,76,31,1],[76,32,76,45,1],[78,13,78,57,1],[79,13,79,14,1],[80,17,80,133,1],[81,17,81,32,1],[82,13,82,14,1],[84,13,84,51,1],[85,18,85,28,1],[86,13,86,14,1],[87,17,87,39,1],[88,17,88,56,1],[89,17,89,18,1],[90,21,90,54,1],[91,21,91,54,1],[94,21,94,92,1],[95,21,95,92,1],[96,21,96,36,1],[97,21,97,27,1],[99,13,99,14,1],[85,48,85,52,1],[85,30,85,46,1],[100,13,100,27,1],[101,9,101,10,1],[110,9,110,10,1],[111,13,111,27,1],[112,13,112,48,1],[113,13,113,31,1],[114,13,114,31,1],[116,13,116,44,1],[116,45,116,124,1],[117,13,117,62,1],[119,18,119,28,1],[120,13,120,14,1],[121,17,121,38,1],[121,39,121,58,1],[122,17,122,40,1],[123,17,123,52,1],[124,17,124,18,1],[127,21,127,117,1],[128,21,128,95,1],[129,21,129,34,1],[131,13,131,14,1],[119,48,119,52,1],[119,30,119,46,1],[132,13,132,25,1],[133,9,133,10,1],[141,9,141,10,1],[143,13,143,58,1],[144,9,144,10,1],[154,9,154,10,1],[155,13,155,39,1],[156,13,156,14,1],[157,17,157,63,1],[158,17,158,32,1],[158,33,158,65,1],[159,17,159,24,1],[159,38,159,51,1],[159,26,159,34,1],[160,17,160,18,1],[161,21,161,106,1],[162,21,162,44,1],[162,45,162,57,1],[163,17,163,18,1],[159,35,159,37,1],[164,13,164,14,1],[166,13,166,14,1],[167,17,167,24,1],[167,38,167,51,1],[167,26,167,34,1],[168,17,168,18,1],[169,21,169,50,1],[169,51,169,63,1],[170,17,170,18,1],[167,35,167,37,1],[171,13,171,14,1],[172,13,172,26,1],[173,9,173,10,1],[181,9,181,10,1],[182,13,182,20,1],[182,33,182,43,1],[182,22,182,29,1],[183,13,183,14,1],[184,17,184,69,1],[185,17,185,37,1],[185,38,185,51,1],[186,13,186,14,1],[182,30,182,32,1],[187,13,187,25,1],[188,9,188,10,1],[198,9,198,10,1],[199,13,199,35,1],[201,13,201,52,1],[202,9,202,10,1],[213,9,213,10,1],[214,13,214,48,1],[215,13,215,34,1],[216,9,216,10,1],[223,9,223,10,1],[224,13,224,52,1],[225,9,225,10,1],[20,9,20,70,1]]);
+    </script>
+  </body>
+</html>

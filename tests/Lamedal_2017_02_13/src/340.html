@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\io\io_stateinfo\io_stateinfo_rw.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System.Diagnostics;
+using LamedalCore;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.IO.IO_StateInfo
+{
+    /// &lt;summary&gt;
+    /// Saves and load the 2 lvl string lookup key value data. This class should not be used directly.
+    /// &lt;/summary&gt;
+    /// &lt;seealso cref=&quot;System.IDisposable&quot; /&gt;
+    public abstract class IO_StateInfo_RW
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance;
+        protected string _FileName = &quot;&quot;;
+        protected string _jsonStr;
+
+
+        /// &lt;summary&gt;Initialises the default file to save and load info from.&lt;/summary&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool InitialiseFile(string defaultFilename = &quot;StateInfo_Classes.json&quot;)
+        {
+            if (_FileName == &quot;&quot;)
+            {
+                if (defaultFilename == &quot;&quot;) defaultFilename = &quot;StateInfo_Classes.json&quot;;
+                string folder = _lamed.lib.IO.Folder.Path_Application();
+                FileName = folder + defaultFilename;
+                return true;
+            }
+            return false;
+        }
+
+        /// &lt;summary&gt;Gets or sets the name of the file. When file is set and it exists, contents will be loaded.&lt;/summary&gt;
+        public virtual string FileName
+        {
+            get { return _FileName; }
+            set
+            {
+                if (_FileName != &quot;&quot;)
+                {
+                    &quot;Error! You can set the file name only once. Call Dispose() first to set another file name&quot;.zException_Show();
+                }
+                _FileName = value;
+                if (_lamed.lib.IO.File.Exists(value) == false)
+                     Debug.WriteLine($&quot;StateInfo file &#39;{value}&#39; does not exists!&quot;);
+                else Debug.WriteLine($&quot;StateInfo file &#39;{value}&#39; initialised.&quot;);
+
+                // Read the state information if file exists
+                _jsonStr = _lamed.lib.IO.RW.File_Read2Str(value, false);
+            }
+        }
+
+
+        /// &lt;summary&gt;Saves the state info.&lt;/summary&gt;
+        /// &lt;param name=&quot;overwrite&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [overwrite].&lt;/param&gt;
+        public void Save(bool overwrite = false)
+        {
+            if (_FileName == &quot;&quot;)
+            {
+                // $&quot;Error! FileName was not assigned to &#39;StateInfo_ClassesIO&#39;.&quot;.zException_Show();
+                Debug.WriteLine(&quot;Filename not assigned to IO_StateInfo_RW.&quot;);
+                return;  // We will ignore the non-saving for now.
+            }
+
+            string state = this.ToString();
+            _lamed.lib.IO.RW.File_Write(_FileName, state, overwrite);
+        }
+
+        /// &lt;summary&gt;Deletes the state information.&lt;/summary&gt;
+        public void Delete()
+        {
+            if (_FileName == &quot;&quot;)
+            {
+                // $&quot;Error! FileName was not assigned to &#39;StateInfo_ClassesIO&#39;.&quot;.zException_Show();
+                Debug.WriteLine(&quot;Filename not assigned to IO_StateInfo_RW.&quot;);
+                return;  // We will ignore the non-saving for now.
+            }
+            _lamed.lib.IO.File.Delete(_FileName);
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[24,44,24,87,0],[29,13,29,26,0],[39,17,39,18,0],[40,21,40,131,0],[41,17,41,18,0],[44,22,44,84,0],[58,13,58,14,0],[60,17,60,78,0],[61,17,61,24,0],[77,13,77,50,0],[21,9,21,10,1],[22,13,22,33,1],[23,13,23,14,1],[24,17,24,43,1],[25,17,25,73,1],[26,17,26,53,1],[27,17,27,29,1],[30,9,30,10,1],[35,17,35,18,1],[35,19,35,36,1],[35,37,35,38,1],[37,13,37,14,1],[38,17,38,37,1],[42,17,42,35,1],[43,17,43,63,1],[45,22,45,80,1],[48,17,48,73,1],[49,13,49,14,1],[56,9,56,10,1],[57,13,57,33,1],[64,13,64,44,1],[65,13,65,70,1],[66,9,66,10,1],[70,9,70,10,1],[71,13,71,33,1],[72,13,72,14,1],[74,17,74,78,1],[75,17,75,24,1],[78,9,78,10,1],[13,9,13,70,1],[14,9,14,41,1]]);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classntattribute\classntblueprintrule\classntblueprintmethodrulealiasdef_methods.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttributes;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttribute.ClassNTBlueprintRule
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.VS_Static)]
+    public static class ClassNTBlueprintMethodRuleAliasDef_Methods
+    {
+        [BlueprintRule_MethodAliasDef(MirrorClass = typeof(string), MirrorMethodName = &quot;mirrorMethod&quot;, MirrorParameter1 = &quot;parName&quot;)]
+        public static bool Attribute_AliasDefinition(string attributeCode, out string attrinuteName, out string mirrorParameter1, out string mirrorClass, out string mirrorMethodName)
+        {
+            List&lt;string&gt; parameters;
+            ClassNTAttributes_Methods.Attribute_Parts(attributeCode, out attrinuteName, out parameters);
+
+            // Default values
+            mirrorParameter1 = null;
+            mirrorClass = null;
+            mirrorMethodName = null;
+
+            if (BlueprintMethodRuleAlias(attrinuteName) == false) return false;  //&lt;================================================
+
+            // Parse the parameters
+            foreach (string parameter in parameters)
+            {
+                if (parameter.Contains(&quot;MirrorParameter1&quot;)) mirrorParameter1 = parameter.zvar_Value(&quot;=&quot;).zRemove_DoubleQuotes();
+                if (parameter.Contains(&quot;MirrorClass&quot;)) mirrorClass = parameter.zvar_Value(&quot;=&quot;).zRemove_DoubleQuotes();
+                if (parameter.Contains(&quot;MirrorMethodName&quot;)) mirrorMethodName = parameter.zvar_Value(&quot;=&quot;).zRemove_DoubleQuotes();
+            }
+            return true;
+        }
+
+        /// &lt;summary&gt;Identifies a Blueprint method rule.&lt;/summary&gt;
+        /// &lt;param name=&quot;name&quot;&gt;The name of the attribute.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public static bool BlueprintMethodRuleAlias(string name)
+        {
+            if (_BlueprintMethodRule1 == null)
+            {
+                _BlueprintMethodRule1 = typeof(BlueprintRule_MethodAliasDefAttribute).Name;
+                _BlueprintMethodRule2 = _BlueprintMethodRule1.Replace(&quot;Attribute&quot;, &quot;&quot;);
+            }
+            return (name == _BlueprintMethodRule1 || name == _BlueprintMethodRule2);
+        }
+        private static string _BlueprintMethodRule1 = null;
+        private static string _BlueprintMethodRule2 = null;
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[15,9,15,10,1],[17,13,17,105,1],[20,13,20,37,1],[21,13,21,32,1],[22,13,22,37,1],[24,13,24,66,1],[24,67,24,80,1],[27,13,27,20,1],[27,42,27,52,1],[27,22,27,38,1],[28,13,28,14,1],[29,17,29,60,1],[29,61,29,129,1],[30,17,30,55,1],[30,56,30,119,1],[31,17,31,60,1],[31,61,31,129,1],[32,13,32,14,1],[27,39,27,41,1],[33,13,33,25,1],[34,9,34,10,1],[40,9,40,10,1],[41,13,41,47,1],[42,13,42,14,1],[43,17,43,92,1],[44,17,44,88,1],[45,13,45,14,1],[46,13,46,85,1],[47,9,47,10,1],[48,9,48,60,1],[49,9,49,60,1]]);
+    </script>
+  </body>
+</html>

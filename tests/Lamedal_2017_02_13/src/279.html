@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\lib_command.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+
+namespace LamedalCore.lib
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action)]
+    public sealed class lib_Command
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance;
+
+        /// &lt;summary&gt;Run a command&lt;/summary&gt;
+        /// &lt;param name=&quot;strCmd&quot;&gt;The string command.&lt;/param&gt;
+        /// &lt;param name=&quot;strArgs&quot;&gt;The string arguments.&lt;/param&gt;
+        /// &lt;param name=&quot;strFolder&quot;&gt;The string folderOrFile.&lt;/param&gt;
+        /// &lt;param name=&quot;waitForExit&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [wait for exit].&lt;/param&gt;
+        [Test_IgnoreCoverage(enTestIgnore.FrontendCode)]
+        public void Execute(string strCmd, string strArgs = &quot;&quot;, string strFolder = &quot;&quot;, bool waitForExit = false)
+        {
+            Console.WriteLine(&quot; -&gt;&quot; + strCmd + &quot; &quot; + strArgs + &quot; (&quot; + strFolder + &quot;)&quot;);
+
+            if (strArgs == &quot;&quot; &amp;&amp; strFolder == &quot;&quot; &amp;&amp; strCmd.Contains(&quot;http&quot;))
+            {
+                Process.Start(&quot;explorer.exe&quot;, strCmd);
+                return;
+            }
+
+            var startInfo = new ProcessStartInfo();
+            startInfo.FileName = strCmd;
+            startInfo.Arguments = strArgs;
+            if (strFolder != &quot;&quot;) startInfo.WorkingDirectory = strFolder;
+            // System.Environment.CurrentDirectory = @&quot;..\..\..&quot;;
+            startInfo.RedirectStandardInput = true;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.CreateNoWindow = true;
+            startInfo.UseShellExecute = false;
+
+            Process process = new Process();
+            process.StartInfo = startInfo;
+            process.Start();
+            if (waitForExit)
+            {
+                process.StandardInput.Flush();
+                process.WaitForExit();
+                Console.WriteLine(process.StandardOutput.ReadToEnd());
+            }
+        }
+
+        /// &lt;summary&gt;Open explorer window for the folderOrFile specified. If none provided the application folderOrFile will be opened.&lt;/summary&gt;
+        /// &lt;param name=&quot;folderOrFile&quot;&gt;The folderOrFile.&lt;/param&gt;
+        /// &lt;param name=&quot;waitForExit&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [wait for exit].&lt;/param&gt;
+        [Test_IgnoreCoverage(enTestIgnore.FrontendCode)]
+        public void Execute_Explorer(string folderOrFile = &quot;&quot;, bool waitForExit = false)
+        {
+            // Default values
+            string folder = folderOrFile;
+            string file = folderOrFile;
+            if (folder == &quot;&quot;)
+            {
+                folder = _lamed.lib.IO.Folder.Path_Application();
+                file = folder;
+            }
+            else
+            {
+                if (_lamed.lib.IO.File.Exists(folder))  // The folderOrFile parameter is a file -&gt; calculate the folder 
+                {
+                    file = folder;
+                    folder = _lamed.lib.IO.Parts.Folder(file);
+                }
+            }
+            file = file.Replace(&quot;/&quot;, @&quot;\&quot;);
+            folder = folder.Replace(&quot;/&quot;, @&quot;\&quot;);
+            Execute(&quot;explorer.exe&quot;, file, folder,waitForExit);
+        }
+
+        /// &lt;summary&gt;Open notepad for the document specified.&lt;/summary&gt;
+        /// &lt;param name=&quot;document&quot;&gt;The document.&lt;/param&gt;
+        /// &lt;param name=&quot;folder&quot;&gt;The folderOrFile.&lt;/param&gt;
+        /// &lt;param name=&quot;waitForExit&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [wait for exit].&lt;/param&gt;
+        [Test_IgnoreCoverage(enTestIgnore.FrontendCode)]
+        public void Execute_Notepad(string document, string folder = &quot;&quot;, bool waitForExit = false)
+        {
+            if (folder == &quot;&quot;) folder = _lamed.lib.IO.Folder.Path_Application();
+            _lamed.lib.Command.Execute(&quot;Notepad.exe&quot;, document, folder,waitForExit);
+        }
+
+        /// &lt;summary&gt;Sleeps the specified milli seconds.&lt;/summary&gt;
+        /// &lt;param name=&quot;milliSeconds&quot;&gt;The milli seconds.&lt;/param&gt;
+        public void Sleep(int milliSeconds)
+        {
+            Task.Delay(milliSeconds).Wait();
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[92,9,92,10,1],[93,13,93,45,1],[94,9,94,10,1],[12,9,12,70,1]]);
+    </script>
+  </body>
+</html>

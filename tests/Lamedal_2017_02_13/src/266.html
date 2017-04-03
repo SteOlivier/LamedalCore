@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\types\list\list_convert.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace LamedalCore.Types.List
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action, DefaultType = typeof(Array), IgnoreGroup = true, GroupName = &quot;Word_FromAbbreviation&quot;)]
+    public sealed class List_Convert
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance; // system library
+
+        /// &lt;summary&gt;1 Demensional array converted to 2D array. Used in Excel operations&lt;/summary&gt;
+        /// &lt;param name=&quot;array&quot;&gt;The array to be converted&lt;/param&gt;
+        /// &lt;param name=&quot;width&quot;&gt;The width of the array&lt;/param&gt;
+        /// &lt;returns&gt;T[,]&lt;/returns&gt;
+        public T[,] Array_2TwoDimensionArray&lt;T&gt;(T[] array, int width)
+        {
+            int height = (int)Math.Ceiling(array.Length / (double)width);
+            T[,] result = new T[height, width];
+
+            for (int index = 0; index &lt; array.Length; index++)
+            {
+                int rowIndex = index / width;
+                int colIndex = index % width;
+                result[rowIndex, colIndex] = array[index];
+            }
+            return result;
+        }
+
+        /// &lt;summary&gt;Conver Int list values to string ranges.&lt;/summary&gt;
+        /// &lt;param name=&quot;numbers&quot;&gt;The numbers.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public IEnumerable&lt;string&gt; Int_ToStrRanges(IEnumerable&lt;int&gt; numbers)
+        {
+            int rangeStart = 0;
+            int previous = 0;
+
+            if (!numbers.Any()) yield break;
+
+            rangeStart = previous = numbers.FirstOrDefault();
+
+            foreach (int n in numbers.Skip(1))
+            {
+                if (n - previous &gt; 1) // sequence break - yield a sequence
+                {
+                    if (previous &gt; rangeStart)
+                        yield return string.Format(&quot;{0}-{1}&quot;, rangeStart, previous);
+                    else yield return rangeStart.ToString();
+
+                    rangeStart = n;
+                }
+                previous = n;
+            }
+
+            if (previous &gt; rangeStart)
+                yield return string.Format(&quot;{0}-{1}&quot;, rangeStart, previous);
+            else yield return rangeStart.ToString();
+        }
+
+        /// &lt;summary&gt;
+        /// Word_FromAbbreviation object list to string list.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;list&quot;&gt;The list.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public IList&lt;T&gt; IListObject_2IListT&lt;T&gt;(IList&lt;object&gt; list)
+        {
+            List&lt;T&gt; stringList = list.Select(s =&gt; (T)s).ToList();
+            return stringList;
+        }
+
+        /// &lt;summary&gt;Create List&lt;T&gt; from IList.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;list&quot;&gt;The list.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public IList&lt;T&gt; IList_2IListT&lt;T&gt;(IList list)
+        {
+            List&lt;T&gt; result = list.Cast&lt;T&gt;().ToList();
+            return result;
+        }
+
+        /// &lt;summary&gt;Create List&lt;T&gt; from IList.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;list&quot;&gt;The list.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public List&lt;T&gt; IList_2ListT&lt;T&gt;(IList list)
+        {
+            var result = list.Cast&lt;T&gt;().ToList();
+            return result;
+        }
+
+        /// &lt;summary&gt;Create List&lt;T&gt; from IList.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;list&quot;&gt;The list.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public List&lt;T&gt; IListT_2ListT&lt;T&gt;(IList&lt;T&gt; list)
+        {
+            return ((List&lt;T&gt;)list);
+        }
+
+        /// &lt;summary&gt;
+        /// Converts enumeral to IList. 
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;toList&quot;&gt;The list.&lt;/param&gt;
+        /// &lt;param name=&quot;enumToConvert&quot;&gt;typeof(myEnum) &lt;br&gt;&lt;/br&gt; The enum to convert.&lt;/param&gt;
+        /// &lt;param name=&quot;clearList&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [clear list].&lt;/param&gt;
+        /// &lt;param name=&quot;prefix&quot;&gt;The prefix.&lt;/param&gt;
+        /// &lt;param name=&quot;postfix&quot;&gt;The postfix.&lt;/param&gt;
+        /// &lt;param name=&quot;replaceUnderscoreWith&quot;&gt;The replace underscore with.&lt;/param&gt;
+        /// &lt;exception cref=&quot;System.ArgumentNullException&quot;&gt;list&lt;/exception&gt;
+        /// &lt;code ShortcutClass=&quot;Enums&quot; GenerateParameter1=&quot;enumToConvert&quot;&gt;&lt;/code&gt;
+        public void IList_FromEnum(IList toList, Type enumToConvert, bool clearList = true, string prefix = &quot;&quot;, string postfix = &quot;&quot;, string replaceUnderscoreWith = &quot;_&quot;)
+        {
+            if (toList == null) throw new ArgumentNullException(nameof(toList));
+
+            if (clearList) toList.Clear();
+            foreach (var enumValue in Enum.GetNames(enumToConvert))
+            {
+                toList.Add(prefix + enumValue.Replace(&quot;_&quot;, replaceUnderscoreWith) + postfix);
+            }
+        }
+    }
+}
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[117,33,117,75,0],[42,33,42,45,0],[61,18,61,53,0],[21,9,21,10,1],[22,13,22,74,1],[23,13,23,48,1],[25,18,25,31,1],[26,13,26,14,1],[27,17,27,46,1],[28,17,28,46,1],[29,17,29,59,1],[30,13,30,14,1],[25,55,25,62,1],[25,33,25,53,1],[31,13,31,27,1],[32,9,32,10,1],[70,9,70,10,1],[71,13,71,51,1],[71,55,71,66,1],[72,13,72,31,1],[73,9,73,10,1],[80,9,80,10,1],[81,13,81,54,1],[82,13,82,27,1],[83,9,83,10,1],[90,9,90,10,1],[91,13,91,50,1],[92,13,92,27,1],[93,9,93,10,1],[100,9,100,10,1],[101,13,101,36,1],[102,9,102,10,1],[116,9,116,10,1],[117,13,117,32,1],[119,13,119,27,1],[119,28,119,43,1],[120,13,120,20,1],[120,39,120,67,1],[120,22,120,35,1],[121,13,121,14,1],[122,17,122,94,1],[123,13,123,14,1],[120,36,120,38,1],[124,9,124,10,1],[14,9,14,70,1],[38,9,38,10,1],[39,13,39,32,1],[40,13,40,30,1],[42,13,42,32,1],[44,13,44,62,1],[46,13,46,20,1],[46,31,46,46,1],[46,22,46,27,1],[47,13,47,14,1],[48,17,48,38,1],[49,17,49,18,1],[50,21,50,47,1],[51,25,51,85,1],[52,26,52,61,1],[54,21,54,36,1],[55,17,55,18,1],[56,17,56,30,1],[57,13,57,14,1],[46,28,46,30,1],[59,13,59,39,1],[60,17,60,77,1],[62,9,62,10,1],[71,51,71,55,1]]);
+    </script>
+  </body>
+</html>

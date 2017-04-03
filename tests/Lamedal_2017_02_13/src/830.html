@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\types\types_test.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+
+namespace LamedalCore.Types
+{
+    /// &lt;summary&gt;
+    /// Conduct a test on the string excluding searching for patterns or values
+    /// &lt;/summary&gt;
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action, DefaultType = typeof(string), GroupName = &quot;Str&quot;)]
+    public sealed class Types_Test
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance;
+
+        /// &lt;summary&gt;Determines whether [is valid string] [the specified s].&lt;/summary&gt;
+        /// &lt;param name=&quot;s&quot;&gt;The string&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool IsValidStr(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return false;
+
+            s = s.Trim();
+            if (s == &quot;\0&quot;) return false;
+            if (s.Length &gt; 0)
+            {
+                char c = Convert.ToChar(s[0]);
+                if (char.IsControl(c)) return false; // if (s == &quot;\u0001&quot;) return false;
+            }
+
+            #region todo
+            /*
+             * Escape Sequence        Character Name               Unicode Encoding
+                \&#39;                     Single quote                 0x0027
+                \&quot;                     Double quote                 0x0022
+                \\                     Backslash                    0x005C
+                \0                     Null                         0x0000
+                \a                     Alert                        0x0007
+                \b                     Backspace                    0x0008
+                \f                     Form feed                    0x000C
+                \n                     newline                      0x000A
+                \r                     Carriage return              0x000D
+                \t                     Horizontal tab               0x0009
+                \v                     Vertical tab                 0x000B
+                \uxxxx                 Unicode character in hex     \u0029
+                */
+            #endregion
+
+            return true;
+        }
+
+        /// &lt;summary&gt;A string extension method that query if &#39;@inputStr&#39; is numeric.&lt;/summary&gt;
+        /// &lt;param name=&quot;inputStr&quot;&gt;The @inputStr to act on.&lt;/param&gt;
+        /// &lt;returns&gt;true if numeric, false if not.&lt;/returns&gt;
+        public bool IsNumeric(string inputStr)
+        {
+            double retNum;
+            bool result = Double.TryParse(inputStr, System.Globalization.NumberStyles.Any,
+                System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
+            return result;
+        }
+
+        /// &lt;summary&gt;Test if &#39;inputStr&#39; is Alpha.&lt;/summary&gt;
+        /// &lt;param name=&quot;inputStr&quot;&gt;The @inputStr to act on.&lt;/param&gt;
+        /// &lt;returns&gt;true if Alpha, false if not.&lt;/returns&gt;
+        public bool IsAlpha(string inputStr)
+        {
+            return _lamed.Types.String.Regex.IsAlpha(inputStr);
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[23,28,23,41,0],[27,40,27,53,0],[19,9,19,10,1],[20,13,20,41,1],[20,42,20,55,1],[22,13,22,26,1],[23,13,23,27,1],[24,13,24,30,1],[25,13,25,14,1],[26,17,26,47,1],[27,17,27,39,1],[28,13,28,14,1],[48,13,48,25,1],[49,9,49,10,1],[55,9,55,10,1],[57,13,58,82,1],[59,13,59,27,1],[60,9,60,10,1],[66,9,66,10,1],[67,13,67,64,1],[68,9,68,10,1],[13,9,13,70,1]]);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classnt_methods.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttribute.ClassNTBlueprintRule;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.PropertyNT;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTHeader;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTStats;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.VS_Static)]
+    public static class ClassNT_Methods
+    {
+        public const string codeSpace = &quot;        &quot;;
+
+        /// &lt;summary&gt;
+        /// Parses the specified sourceLines.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;sourceLines&quot;&gt;The sourceLines.&lt;/param&gt;
+        /// &lt;param name=&quot;ii&quot;&gt;The ii.&lt;/param&gt;
+        /// &lt;param name=&quot;classRef&quot;&gt;The class reference.&lt;/param&gt;
+        /// &lt;param name=&quot;error&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [error].&lt;/param&gt;
+        /// &lt;param name=&quot;classHeader&quot;&gt;The class header.&lt;/param&gt;
+        /// &lt;param name=&quot;methods&quot;&gt;The tag_ methods.&lt;/param&gt;
+        /// &lt;param name=&quot;properties&quot;&gt;The tag_ properties.&lt;/param&gt;
+        /// &lt;param name=&quot;statistics&quot;&gt;The statistics.&lt;/param&gt;
+        /// &lt;param name=&quot;blueprintRule&quot;&gt;The blueprint rule.&lt;/param&gt;
+        public static void Parse_Class(List&lt;string&gt; sourceLines, ref int ii, ClassNT_ classRef, out bool error, out ClassNTHeader_ classHeader, out List&lt;MethodNT_&gt; methods, 
+                    out List&lt;PropertyNT_&gt; properties, out ClassNTStats_ statistics, out ClassNTBlueprintRule_ blueprintRule)
+        {
+            // =======================================================================================
+            // Note: The ii parameter is not used but is required by the ISourceCodeTemplate interface
+            // =======================================================================================
+
+            // Create property classes
+            methods = new List&lt;MethodNT_&gt;();   // Methods contained in the class
+            properties = new List&lt;PropertyNT_&gt;();
+            blueprintRule = null;
+
+            var Setup_RegionStack = new Stack&lt;Tuple&lt;string, int, bool&gt;&gt;();  // Region name, line no, 
+            //Setup_SourceCode = sourceLines;
+
+            // Variables needed to parse the body
+            error = false;
+            int iBlocks = 0;
+            //bool header = true;
+            bool methodStart = false;
+            bool commentStart = false;
+            statistics = ClassNTStats_.Create();
+
+            statistics.ClassTotalLines = sourceLines.Count;
+
+            //// Parse the header information
+            //_Header = new sourceClassHeader_(sourceLines, ref ii, Tag_Statistics);
+            classHeader = ClassNTHeader_.Create(sourceLines, out ii, statistics);
+            if (classHeader != null) blueprintRule = ClassNTBlueprintRule_.Create(classHeader.NameSpace_AttributeLines);
+            //ii++;
+
+            //bool classHelp = false;
+            string methodScope = &quot;&quot;;
+
+            int iiMethodStart = ii;
+            int iiMethodEnd = 0;
+
+            // Body ====================================
+            for (; ii &lt; sourceLines.Count; ii++)
+            {
+                string line = sourceLines[ii];
+
+                if (iBlocks == 0)
+                {
+                    #region -[regions
+
+                    if (line.Contains(&quot;#region&quot;))
+                    {
+                        var region = line;
+                        &quot;#region &quot;.zVar_Next(ref region);
+                        if (region == &quot;&quot;) region = &quot;region&quot;;  // Needs unit test 
+                        Setup_RegionStack.Push(Tuple.Create(region, ii, true)); // True indicate that a new region was found
+                    }
+                    if (line.Contains(&quot;#endregion&quot;))
+                    {
+                        Setup_RegionStack.Pop();
+                        if (Setup_RegionStack.Count &gt; 0)   // Needs unit test 
+                        {
+                            Tuple&lt;string, int, bool&gt; region = Setup_RegionStack.Pop();
+                            Setup_RegionStack.Push(Tuple.Create(region.Item1, region.Item2, false)); // Change value to false of top item on stack
+                        }
+                    }
+
+                    #endregion
+
+                    if (!commentStart)
+                    {
+                        if (line.Contains(&quot;/// &quot;) &amp;&amp; !line.Contains(&quot;////&quot;))
+                        {
+                            commentStart = true;
+                            iiMethodStart = ii;
+                        }
+                    }
+
+                    if (methodStart == false)
+                    {
+                        #region -[Method Start
+
+                        if (line.zContains_Any(&quot;(&quot;, &quot;)&quot;) // Most methods will have this
+                            &amp;&amp; line.zContains_Any(out methodScope, StringComparison.CurrentCulture, &quot;private&quot;, &quot;public&quot;, &quot;internal&quot;) // Most methods will have this
+                            &amp;&amp; line.zContains_All(&quot;=&quot;, &quot;new&quot;) == false // Methods will not have this
+                            &amp;&amp; line.zContains_Any(&quot;/// &quot;, &quot; class &quot;, &quot; get &quot;) == false  // Methods header line will not have these
+                            &amp;&amp; line.Trim().Substring(0, 1) != &quot;[&quot;) //  This is a flag
+                        {
+                            if (line.zContains_All(&quot;(&quot;, &quot;=&quot;) == false || line.IndexOf(&quot;=&quot;) &gt;= line.IndexOf(&quot;(&quot;))
+                            // If there is a &#39;(&#39; and &#39;=&#39; --&gt; &#39;(&#39; must always be first 
+                            {
+                                methodStart = true;
+                                if (commentStart == false) iiMethodStart = ii;
+                                //iBlocks = 0;
+                            }
+                            // For a method the &#39;;&#39; will always follow the &#39;(&#39; and the  &#39;)&#39;
+                            if (line.zContains_All(&quot;(&quot;, &quot;;&quot;) &amp;&amp; line.IndexOf(&quot;;&quot;) &lt;= line.IndexOf(&quot;(&quot;))  // Needs unit test 
+                            {
+                                methodStart = false;
+                            }
+                        }
+                        else if (commentStart &amp;&amp; (line.Contains(&quot;/// &quot;) == false &amp;&amp; line.Contains(&quot;[Pure]&quot;) == false))
+                        {
+                            commentStart = false;
+                        }
+
+                        if (line.zContains_All(&quot;{&quot;, &quot;}&quot;) == false) continue; //&lt;================================
+
+                        #endregion
+                    }
+                }
+
+                // This is a simple property
+                if (line.zContains_All(&quot;get&quot;, &quot;{&quot;, &quot;??&quot;, &quot;}&quot;) &amp;&amp; line.Contains(&quot;.zContains_All&quot;) == false)
+                // Ignore this line in  myself      
+                {
+                    var test = line.Trim();
+                    if (test.Length &lt;= 2 || test.Substring(0, 2) != &quot;//&quot;) // Make sure line is not commented out
+                    {
+                        var propertyLine = sourceLines[ii - 2].Trim();
+                        var property = PropertyNT_.Create(propertyLine);
+                        properties.Add(property);
+                    }
+                }
+
+                // ================================================Method Body
+                if (line.Contains(&quot;{&quot;))
+                {
+                    iBlocks++;
+                    commentStart = false;
+                }
+
+                #region -[Method End
+
+                if (line.Contains(&quot;}&quot;) || (line.zContains_Any(&quot;private&quot;, &quot;public&quot;, &quot;internal&quot;) &amp;&amp; line.Contains(&quot;);&quot;)))
+                // or contains private / public with );  // private static extern bool SetForegroundWindow(IntPtr hWnd);
+                {
+                    if (line.Contains(&quot;}&quot;)) iBlocks--;
+                    if (iBlocks == 0)
+                    {
+                        iiMethodEnd = ii;
+                        #region debug
+                        //var debug = false;
+                        //if (debug) // || methodStart == false
+                        //{
+                        //    var source = LamedalCore_.Instance.Types.List.String.ToString(sourceLines, &quot;&quot;.NL(), false, iiMethodStart,iiMethodEnd + 1);
+                        //    (&quot;Class Method found:&quot; + source).zException_Show(action: enExceptionAction.ShowMessage);
+                        //    break;
+                        //}
+                        #endregion
+
+                        if (methodStart == true)
+                        {
+                            methodStart = false;
+                            var method = MethodNT_.Create(sourceLines, ref iiMethodStart, iiMethodEnd, classRef);
+                            methods.Add(method);
+                            statistics.zUpdate(method);
+                        }
+                    }
+                }
+
+                #endregion
+            }
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[82,43,82,61,0],[89,25,89,26,0],[90,29,90,87,0],[91,29,91,101,0],[92,25,92,26,0],[125,29,125,30,0],[126,33,126,53,0],[127,29,127,30,0],[34,9,34,10,1],[40,13,40,45,1],[41,13,41,50,1],[42,13,42,34,1],[44,13,44,75,1],[48,13,48,27,1],[49,13,49,29,1],[51,13,51,38,1],[52,13,52,39,1],[53,13,53,49,1],[55,13,55,60,1],[59,13,59,82,1],[60,13,60,37,1],[60,38,60,121,1],[64,13,64,37,1],[66,13,66,36,1],[67,13,67,33,1],[71,13,71,14,1],[72,17,72,47,1],[74,17,74,34,1],[75,17,75,18,1],[78,21,78,50,1],[79,21,79,22,1],[80,25,80,43,1],[81,25,81,58,1],[82,25,82,42,1],[83,25,83,80,1],[84,21,84,22,1],[85,21,85,53,1],[86,21,86,22,1],[87,25,87,49,1],[88,25,88,57,1],[93,21,93,22,1],[97,21,97,39,1],[98,21,98,22,1],[99,25,99,77,1],[100,25,100,26,1],[101,29,101,49,1],[102,29,102,48,1],[103,25,103,26,1],[104,21,104,22,1],[106,21,106,46,1],[107,21,107,22,1],[110,25,114,67,1],[115,25,115,26,1],[116,29,116,113,1],[118,29,118,30,1],[119,33,119,52,1],[120,33,120,59,1],[120,60,120,79,1],[122,29,122,30,1],[124,29,124,104,1],[128,25,128,26,1],[129,30,129,119,1],[130,25,130,26,1],[131,29,131,50,1],[132,25,132,26,1],[134,25,134,67,1],[134,68,134,77,1],[137,21,137,22,1],[138,17,138,18,1],[141,17,141,107,1],[143,17,143,18,1],[144,21,144,44,1],[145,21,145,74,1],[146,21,146,22,1],[147,25,147,71,1],[148,25,148,73,1],[149,25,149,50,1],[150,21,150,22,1],[151,17,151,18,1],[154,17,154,40,1],[155,17,155,18,1],[156,21,156,31,1],[157,21,157,42,1],[158,17,158,18,1],[162,17,162,120,1],[164,17,164,18,1],[165,21,165,44,1],[165,45,165,55,1],[166,21,166,38,1],[167,21,167,22,1],[168,25,168,42,1],[179,25,179,49,1],[180,25,180,26,1],[181,29,181,49,1],[182,29,182,114,1],[183,29,183,49,1],[184,29,184,56,1],[185,25,185,26,1],[186,21,186,22,1],[187,17,187,18,1],[190,13,190,14,1],[70,44,70,48,1],[70,20,70,42,1],[191,9,191,10,1]]);
+    </script>
+  </body>
+</html>

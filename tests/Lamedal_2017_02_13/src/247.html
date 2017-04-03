@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\types\types_convert.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
+using System.Reflection;
+using JetBrains.Annotations;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.zz;
+
+namespace LamedalCore.Types
+{
+    /// &lt;summary&gt;
+    /// Do type conversions; group=As;
+    /// &lt;/summary&gt;
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action)]
+    public sealed class Types_Convert
+    {
+        private readonly Types_Object _object = LamedalCore_.Instance.Types.Object;
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance; // system library
+
+        #region bool
+
+        /// &lt;summary&gt;
+        /// Determines whether the string value is a true or false bool value.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;strValue&quot;&gt;The string value&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        [Pure]
+        public bool Bool_FromStr(string strValue)
+        {
+            // || Word_FromAbbreviation.IsDBNull(strValue)
+            if (string.IsNullOrEmpty(strValue)  || strValue == &quot;0&quot;) return false;
+            if (strValue == &quot;1&quot;) return true;
+            return Convert.ToBoolean(strValue);
+        }
+
+        /// &lt;summary&gt;
+        /// Determines wheter the object is a true or false bool value.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;Object&quot;&gt;The object&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        [Pure]
+        public bool Bool_FromObj(object Object)
+        {
+            if (this._object.IsNull(Object)) return false;
+
+            var result = false; // Default value
+            try
+            {
+                result = Convert.ToBoolean(Object);
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    var strValue = Str_FromObj(Object);
+                    result = Bool_FromStr(strValue);
+                }
+                catch (Exception ex)
+                {
+                    ex.zException_Show();
+                }
+            }
+            return result;
+        }
+
+        /// &lt;summary&gt;
+        /// Function to convert object to nullable bool.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;Object&quot;&gt;The object&lt;/param&gt;
+        /// &lt;param name=&quot;nullValue&quot;&gt;The null value setting. Default value = null.&lt;/param&gt;
+        /// &lt;returns&gt;bool?&lt;/returns&gt;
+        [Pure]
+        public bool? Bool_FromObj2(object Object, bool? nullValue = null)
+        {
+            if (this._object.IsNull(Object) || Str_FromObj(Object) == &quot;&quot;) return nullValue;
+
+            return Bool_FromObj(Object);
+        }
+
+        #endregion
+
+        /// &lt;summary&gt;Function to convert object value to date.&lt;/summary&gt;
+        /// &lt;param name=&quot;Object&quot;&gt;The object.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        [Pure]
+        public DateTime DateTime_FromObj(object Object)
+        {
+            if (this._object.IsNull(Object)) return DateTime.MinValue;
+            if (Object is DateTime) return Convert.ToDateTime(Object);
+
+            DateTime result = _lamed.Types.DateTime.null_;
+            try
+            {
+                result = Convert.ToDateTime(Object);
+            }
+            catch (Exception ex)
+            {
+                ex.zException_Show(&quot;Error! Unable to convert object to DateTime!&quot;);
+            }
+
+            return result;
+        }
+
+        /// &lt;summary&gt;
+        /// Function to convert an object to double.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;Object&quot;&gt;The object.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        [Pure]
+        public double Double_FromObj(object Object)
+        {
+            return Convert.ToDouble(Object);
+        }
+
+        /// &lt;summary&gt;
+        /// Function to return a global unique identifier from the string value.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;strValue&quot;&gt;The string value&lt;/param&gt;
+        /// &lt;returns&gt;Guid&lt;/returns&gt;
+        [Pure]
+        public Guid Guid_FromStr(string strValue)
+        {
+            if (strValue == &quot;-1&quot; || strValue == &quot;&quot;) return Guid.Empty;
+            Guid guidValue;
+            Guid.TryParse(strValue, out guidValue);
+            return guidValue;
+        }
+
+        /// &lt;summary&gt;
+        /// Function to return a global unique identifier from the object.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;Object&quot;&gt;The object&lt;/param&gt;
+        /// &lt;returns&gt;Guid&lt;/returns&gt;
+        [Pure]
+        public Guid Guid_FromObj(object Object)
+        {
+            if (_object.IsNull(Object)) return Guid.Empty;
+            if (Object is Guid) return Guid.Parse(Object.ToString());
+            return Guid.Empty;
+        }
+
+        #region Int
+
+        /// &lt;summary&gt;
+        /// Function to return int  from the string value.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;strValue&quot;&gt;The string value&lt;/param&gt;
+        /// &lt;param name=&quot;nullValue&quot;&gt;The null value setting. Default value = 0.&lt;/param&gt;
+        /// &lt;returns&gt;int&lt;/returns&gt;
+        [Pure]
+        public int Int_FromStr(string strValue, int nullValue = 0)
+        {
+            int iValue;
+            var result = int.TryParse(strValue, out iValue);
+            if (!result)
+            {
+                double dValue;
+                result = double.TryParse(strValue, out dValue);
+                if (result) iValue = (int)(dValue + 0.5);
+            }
+
+            return result ? iValue : nullValue;
+        }
+
+        /// &lt;summary&gt;
+        /// Function to return int  from the string value.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;charValue&quot;&gt;The string value&lt;/param&gt;
+        /// &lt;returns&gt;int&lt;/returns&gt;
+        [Pure]
+        public int Int_FromChar(char charValue)
+        {
+            var result = (int)Char.GetNumericValue(charValue);
+            return result;
+        }
+
+        /// &lt;summary&gt;
+        /// Function to return int value from the object.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;Object&quot;&gt;The object&lt;/param&gt;
+        /// &lt;returns&gt;int&lt;/returns&gt;
+        [Pure]
+        public int Int_FromObj(object Object)
+        {
+            return (int)Int_FromObj2(Object, 0);
+        }
+
+
+
+        /// &lt;summary&gt;
+        /// Function to return nullable int from the object.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;Object&quot;&gt;The object&lt;/param&gt;
+        /// &lt;param name=&quot;nullValue&quot;&gt;The null value setting. Default value = null.&lt;/param&gt;
+        /// &lt;returns&gt;int?&lt;/returns&gt;
+        [Pure]
+        public int? Int_FromObj2(object Object, int? nullValue = null)
+        {
+            if (this._object.IsNull(Object)) return nullValue;
+            if (Object is bool) return (bool)Object ? 1 : 0;
+            if (this._object.IsNumber(Object)) return Convert.ToInt32(Object); // Even doubles need to be converted to in
+            if (Object is string) return Int_FromStr(Object.ToString());
+
+            return nullValue;
+        }
+
+        #endregion
+
+
+        #region Str
+
+        /// &lt;summary&gt;
+        /// Function to return string from the object.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;Object&quot;&gt;The object&lt;/param&gt;
+        /// &lt;param name=&quot;minWidth&quot;&gt;The minimum width setting. Default value = 0.&lt;/param&gt;
+        /// &lt;param name=&quot;fillchar&quot;&gt;The fillchar setting. Default value = &#39;0&#39;.&lt;/param&gt;
+        /// &lt;param name=&quot;zeroValue&quot;&gt;The ero value setting. Default value = &quot;0&quot;.&lt;/param&gt;
+        /// &lt;returns&gt;
+        /// string
+        /// &lt;/returns&gt;
+        [Pure]
+        public string Str_FromObj(object Object, int minWidth = 0, char fillchar = &#39;0&#39;, string zeroValue = &quot;0&quot;)
+        {
+            var result = &quot;&quot;;
+            if (this._object.IsNull(Object) == false)
+            {
+                if (Object is string) result = Object as string;
+                else if (Object is bool) result = Str_FromBool((bool)Object);
+                else if (Object is int) result = Str_FromInt((int)Object);
+                else if (Object is Enum)
+                {
+                    result = Object.ToString();
+                    result = result.Replace(&quot;_&quot;, &quot; &quot;);
+                }
+                else if (Object is Type)
+                {
+                    if (typeof(string) == (Type)Object) return &quot;string&quot;;
+                    if (typeof(Enum) == (Type) Object) return &quot;Enum&quot;;
+                    return Object.ToString();
+                }
+                else if (Object is IList)
+                {
+                    var list = _lamed.Types.List.Convert.IList_2IListT&lt;string&gt;((IList)Object);
+                    result = &quot;[&quot; +_lamed.Types.List.String.ToString(list, &quot;,&quot;) + &quot;]&quot;;
+                }
+                else if (_lamed.Types.Object.IsClass(Object))
+                {
+                    var dict = _lamed.Types.Dictionary.Object_ToDictionary(Object);
+                    var lines = dict.Select(x =&gt; $&quot;{x.Key} = {x.Value.zObject().AsStr()}&quot;).ToList();
+                    var str = lines.zTo_Str(&quot;, &quot;);
+                    return str;
+                }
+                else
+                {
+                    result = Object.ToString();
+                }
+            }
+
+            Str_Format(ref result, minWidth, fillchar, zeroValue);
+            return result;
+        }
+        /// &lt;summary&gt;
+        /// Function to return string  from the int value.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;intValue&quot;&gt;The int value&lt;/param&gt;
+        /// &lt;param name=&quot;minWidth&quot;&gt;The minimum width setting. Default value = 0.&lt;/param&gt;
+        /// &lt;param name=&quot;fillchar&quot;&gt;The fillchar setting. Default value = &amp;apos;0&amp;apos;.&lt;/param&gt;
+        /// &lt;param name=&quot;zeroValue&quot;&gt;The ero value setting. Default value = &amp;quot;0&amp;quot;.&lt;/param&gt;
+        /// &lt;returns&gt;string&lt;/returns&gt;
+        [Pure]
+        public string Str_FromInt(int intValue, int minWidth = 0, char fillchar = &#39;0&#39;, string zeroValue = &quot;0&quot;)
+        {
+            var result = intValue.ToString();
+            Str_Format(ref result, minWidth, fillchar, zeroValue);
+            return result;
+        }
+
+        /// &lt;summary&gt;
+        /// Function to return string  from bool value indicator.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;boolValue&quot;&gt;Bool_FromStr value indicator&lt;/param&gt;
+        /// &lt;returns&gt;string&lt;/returns&gt;
+        [Pure]
+        public string Str_FromBool(bool boolValue)
+        {
+            return (boolValue) ? &quot;true&quot; : &quot;false&quot;;
+        }
+
+        /// &lt;summary&gt;
+        /// Format the string to number value.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;result&quot;&gt;The result reference variable&lt;/param&gt;
+        /// &lt;param name=&quot;minWidth&quot;&gt;The minimum width setting. Default value = 0.&lt;/param&gt;
+        /// &lt;param name=&quot;fillChar&quot;&gt;The fill character setting. Default value = &amp;apos;0&amp;apos;.&lt;/param&gt;
+        /// &lt;param name=&quot;zeroValue&quot;&gt;The zero value setting. Default value = &amp;quot;0&amp;quot;.&lt;/param&gt;
+        public void Str_Format(ref string result, int minWidth = 0, char fillChar = &#39;0&#39;, string zeroValue = &quot;0&quot;)
+        {
+            if (zeroValue != &quot;0&quot; &amp;&amp; result == &quot;0&quot;) result = result.Replace(&quot;0&quot;, zeroValue); // Define the 0 char
+            if (minWidth != 0) result = result.PadLeft(minWidth, fillChar); // Add the fill char
+        }
+        #endregion
+
+        /// &lt;summary&gt;
+        /// Converts the stringtype name to type.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;strType&quot;&gt;The string type&lt;/param&gt;
+        /// &lt;returns&gt;Type&lt;/returns&gt;
+        public Type Type_FromStr(string strType)
+        {
+            var test = strType;
+            if (test == &quot;string&quot;) test = &quot;System.String&quot;;
+            else if (test.zIn(&quot;string&quot;, &quot;Enum&quot;, &quot;Exception&quot;, &quot;Array&quot;)) test = &quot;System.&quot; + strType;
+            else if (test == &quot;Assembly&quot;) return typeof(Assembly);
+
+            var result = Type.GetType(test);
+            if (result == null) (&quot;Error! Unable to find type &#39;{0}&#39;.&quot;.zFormat(test)).zException_Show();
+            return result;
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[63,17,63,18,0],[101,13,101,14,0],[31,9,31,10,1],[33,13,33,68,1],[33,69,33,82,1],[34,13,34,33,1],[34,34,34,46,1],[35,13,35,48,1],[36,9,36,10,1],[45,9,45,10,1],[46,13,46,45,1],[46,46,46,59,1],[48,13,48,32,1],[50,13,50,14,1],[51,17,51,52,1],[52,13,52,14,1],[53,13,53,30,1],[54,13,54,14,1],[56,17,56,18,1],[57,21,57,56,1],[58,21,58,53,1],[59,17,59,18,1],[60,17,60,37,1],[61,17,61,18,1],[62,21,62,42,1],[64,13,64,14,1],[65,13,65,27,1],[66,9,66,10,1],[76,9,76,10,1],[77,13,77,74,1],[77,75,77,92,1],[79,13,79,41,1],[80,9,80,10,1],[89,9,89,10,1],[90,13,90,45,1],[90,46,90,71,1],[91,13,91,36,1],[91,37,91,71,1],[93,13,93,59,1],[95,13,95,14,1],[96,17,96,53,1],[97,13,97,14,1],[98,13,98,33,1],[99,13,99,14,1],[100,17,100,84,1],[103,13,103,27,1],[104,9,104,10,1],[113,9,113,10,1],[114,13,114,45,1],[115,9,115,10,1],[124,9,124,10,1],[125,13,125,52,1],[125,53,125,71,1],[127,13,127,52,1],[128,13,128,30,1],[129,9,129,10,1],[138,9,138,10,1],[139,13,139,40,1],[139,41,139,59,1],[140,13,140,32,1],[140,33,140,70,1],[141,13,141,31,1],[142,9,142,10,1],[154,9,154,10,1],[156,13,156,61,1],[157,13,157,25,1],[158,13,158,14,1],[160,17,160,64,1],[161,17,161,28,1],[161,29,161,58,1],[162,13,162,14,1],[164,13,164,48,1],[165,9,165,10,1],[174,9,174,10,1],[175,13,175,63,1],[176,13,176,27,1],[177,9,177,10,1],[186,9,186,10,1],[187,13,187,49,1],[188,9,188,10,1],[200,9,200,10,1],[201,13,201,45,1],[201,46,201,63,1],[202,13,202,32,1],[202,33,202,61,1],[203,13,203,47,1],[203,48,203,79,1],[204,13,204,34,1],[204,35,204,73,1],[206,13,206,30,1],[207,9,207,10,1],[226,9,226,10,1],[227,13,227,29,1],[228,13,228,54,1],[229,13,229,14,1],[230,17,230,38,1],[230,39,230,65,1],[231,22,231,41,1],[231,42,231,78,1],[232,22,232,40,1],[232,41,232,75,1],[233,22,233,41,1],[234,17,234,18,1],[235,21,235,48,1],[236,21,236,55,1],[237,17,237,18,1],[238,22,238,41,1],[239,17,239,18,1],[240,21,240,56,1],[240,57,240,73,1],[241,21,241,55,1],[241,56,241,70,1],[242,21,242,46,1],[244,22,244,42,1],[245,17,245,18,1],[246,21,246,95,1],[247,21,247,86,1],[248,17,248,18,1],[249,22,249,62,1],[250,17,250,18,1],[251,21,251,84,1],[252,21,252,50,1],[252,90,252,101,1],[253,21,253,51,1],[254,21,254,32,1],[257,17,257,18,1],[258,21,258,48,1],[259,17,259,18,1],[260,13,260,14,1],[262,13,262,67,1],[263,13,263,27,1],[264,9,264,10,1],[275,9,275,10,1],[276,13,276,46,1],[277,13,277,67,1],[278,13,278,27,1],[279,9,279,10,1],[288,9,288,10,1],[289,13,289,51,1],[290,9,290,10,1],[300,9,300,10,1],[301,13,301,51,1],[301,52,301,92,1],[302,13,302,31,1],[302,32,302,76,1],[303,9,303,10,1],[312,9,312,10,1],[313,13,313,32,1],[314,13,314,34,1],[314,35,314,58,1],[315,18,315,71,1],[315,72,315,99,1],[316,18,316,41,1],[316,42,316,66,1],[318,13,318,45,1],[319,13,319,32,1],[319,33,319,103,1],[320,13,320,27,1],[321,9,321,10,1],[19,9,19,84,1],[20,9,20,70,1],[252,50,252,90,1]]);
+    </script>
+  </body>
+</html>

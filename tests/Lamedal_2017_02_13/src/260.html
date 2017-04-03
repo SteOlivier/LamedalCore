@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\types\string\string_setup.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.zz;
+
+namespace LamedalCore.Types.String
+{
+    /// &lt;summary&gt;
+    /// Set quotes and new line characters
+    /// &lt;/summary&gt;
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action, DefaultType = typeof(string), GroupName = &quot;Str&quot;)]
+    public sealed class String_Setup
+    {
+        private readonly Types_Convert As = LamedalCore_.Instance.Types.Convert;
+        private readonly Types_Object Object = LamedalCore_.Instance.Types.Object;
+
+        /// &lt;summary&gt;Return new line characters for SQL strings.&lt;/summary&gt;
+        /// &lt;returns&gt;string&lt;/returns&gt;
+        [Pure]
+        public string SQL_NL()
+        {
+            return &quot;&#39; + CHAR(13) + CHAR(10) + &#39;&quot;;
+        }
+
+        /// &lt;summary&gt;
+        /// Add comma and single quote to the specified inputStr.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;inputStr&quot;&gt;The inputStr.&lt;/param&gt;
+        public string cQ(string inputStr)
+        {
+            return &quot;,&quot; + Q(inputStr);
+        }
+
+        /// &lt;summary&gt;Add single quote string to the global unique identifier.&lt;/summary&gt;
+        /// &lt;param name=&quot;guid&quot;&gt;The global unique identifier&lt;/param&gt;
+        /// &lt;returns&gt;string&lt;/returns&gt;
+        [Pure]
+        public string Q(Guid guid)
+        {
+            return &quot;&#39;&quot; + guid + &quot;&#39;&quot;;
+        }
+
+        /// &lt;summary&gt;Add single quote string to the date inputStr.&lt;/summary&gt;
+        /// &lt;param name=&quot;dateValue&quot;&gt;The date inputStr&lt;/param&gt;
+        /// &lt;returns&gt;string&lt;/returns&gt;
+        [Pure]
+        public string Q(DateTime dateValue)
+        {
+            return &quot;&#39;&quot; + dateValue.Date.ToString(&quot;yyyy-MM-dd&quot;) + &quot; 00:00:00&#39;&quot;;
+        }
+
+        /// &lt;summary&gt;Add single quote string to the input string.&lt;/summary&gt;
+        /// &lt;param name=&quot;inputStr&quot;&gt;The input string&lt;/param&gt;
+        /// &lt;returns&gt;string&lt;/returns&gt;
+        [Pure]
+        public string Q(string inputStr)
+        {
+            if (inputStr == null) return &quot;NULL&quot;;
+            return &quot;&#39;&quot; + inputStr + &quot;&#39;&quot;;
+        }
+
+        /// &lt;summary&gt;Add double quote to the input string.&lt;/summary&gt;
+        /// &lt;param name=&quot;inputStr&quot;&gt;The input string&lt;/param&gt;
+        /// &lt;returns&gt;string&lt;/returns&gt;
+        [Pure]
+        public string QQ(string inputStr)
+        {
+            if (inputStr == null) return &quot;&quot;;
+
+            return &quot;\&quot;&quot; + inputStr.Replace(&quot;\&quot;&quot;, &quot;\\\&quot;&quot;) + &quot;\&quot;&quot;;
+        }
+
+        /// &lt;summary&gt;Function to add single quote string to SQL object variables by inspecting the underlying type.&lt;/summary&gt;
+        /// &lt;param name=&quot;Object&quot;&gt;The object&lt;/param&gt;
+        /// &lt;param name=&quot;addN&quot;&gt;Add n indicator. Default inputStr = false.&lt;/param&gt;
+        /// &lt;returns&gt;string&lt;/returns&gt;
+        [Pure]
+        public string SQL_Q(object Object, bool addN = false)
+        {
+            if (this.Object.IsNull(Object)) return &quot;NULL&quot;;
+
+            var result = As.Str_FromObj(Object);   // default inputStr
+
+            if (Object is string)
+            {
+                var N = (addN) ? &quot;N&#39;&quot; : &quot;&#39;&quot;;
+                result = result.Replace(&quot;&#39;&quot;, &quot;&#39;&#39;&quot;);
+                result = N + result.Replace(&quot;&quot;.NL(), SQL_NL()) + &quot;&#39;&quot;;
+                return result;
+            }
+            if (Object is DateTime || Object is Guid) return &quot;&#39;&quot; + result + &quot;&#39;&quot;;
+            if (Object is bool) return As.Bool_FromObj(Object) ? &quot;1&quot; : &quot;0&quot;;
+            if (this.Object.IsNumber(Object)) return result;
+
+            // ===============
+            // Error condition
+            // ===============
+            (&quot;Error! Cannot convert type &#39;&quot; + Object.GetType() + &quot;&#39; to SQL!&quot;).zException_Show();  // Unable to test -&gt; add unit test condition on error
+            return null;
+        }
+
+        /// &lt;summary&gt;Word_FromAbbreviation all single quote characters to double single quotes to make it  SQL compatible.&lt;/summary&gt;
+        /// &lt;param name=&quot;inputStr&quot;&gt;The inputStr&lt;/param&gt;
+        /// &lt;returns&gt;string&lt;/returns&gt;
+        [Pure]
+        public string SQL_Q(string inputStr)
+        {
+            if (inputStr == null) return &quot;NULL&quot;;
+
+            inputStr = inputStr.Replace(&quot;&#39;&quot;, &quot;&#39;&#39;&quot;);   // Make it save if there is already a &#39;
+            return Q(inputStr);
+        }
+
+        /// &lt;summary&gt;
+        /// Removes the double quotes from the line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line&lt;/param&gt;
+        /// &lt;returns&gt;string&lt;/returns&gt;
+        [Pure]
+        public string Remove_DoubleQuotes([NotNull] string line)
+        {
+            return line.Replace(&quot;\&quot;&quot;, &quot;&quot;);
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[103,13,103,97,0],[104,13,104,25,0],[26,9,26,10,1],[27,13,27,50,1],[28,9,28,10,1],[35,9,35,10,1],[36,13,36,38,1],[37,9,37,10,1],[44,9,44,10,1],[45,13,45,37,1],[46,9,46,10,1],[53,9,53,10,1],[54,13,54,79,1],[55,9,55,10,1],[62,9,62,10,1],[63,13,63,34,1],[63,35,63,49,1],[64,13,64,41,1],[65,9,65,10,1],[72,9,72,10,1],[73,13,73,34,1],[73,35,73,45,1],[75,13,75,65,1],[76,9,76,10,1],[84,9,84,10,1],[85,13,85,44,1],[85,45,85,59,1],[87,13,87,49,1],[89,13,89,34,1],[90,13,90,14,1],[91,17,91,45,1],[92,17,92,52,1],[93,17,93,70,1],[94,17,94,31,1],[96,13,96,54,1],[96,55,96,81,1],[97,13,97,32,1],[97,33,97,76,1],[98,13,98,46,1],[98,47,98,61,1],[105,9,105,10,1],[112,9,112,10,1],[113,13,113,34,1],[113,35,113,49,1],[115,13,115,52,1],[116,13,116,32,1],[117,9,117,10,1],[126,9,126,10,1],[127,13,127,43,1],[128,9,128,10,1],[19,9,19,81,1],[20,9,20,83,1]]);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+{
+  "NameSpace_Name": "Blueprint.lib.Rules.Types",
+  "NameSpace_UsingLines": [
+    "System"
+  ],
+  "NameSpace_AttributeLines": [
+    "[BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action)]",
+    "[BlueprintCodeInjection_(typeof(Controller_BlueprintLogger), true)]"
+  ],
+  "Namespace_Attributes": {
+    "Items": [
+      {
+        "AttributeName": "BlueprintRule_Class",
+        "Parameters": [
+          {
+            "Name": "BlueprintRule_Class",
+            "Value": "enBlueprintClassNetworkType.Node_Action",
+            "IsEnumeral": true
+          }
+        ]
+      },
+      {
+        "AttributeName": "BlueprintCodeInjection_",
+        "Parameters": [
+          {
+            "Name": "BlueprintCodeInjection_",
+            "Value": "typeof(Controller_BlueprintLogger)",
+            "IsEnumeral": false
+          },
+          {
+            "Name": "BlueprintCodeInjection_",
+            "Value": true,
+            "IsEnumeral": false
+          }
+        ]
+      }
+    ]
+  },
+  "ClassName": "Types_Money",
+  "ClassName_ShortVersion": "Money",
+  "ClassName_Group": "Types",
+  "ClassName1": "Types",
+  "ClassName2": "Money",
+  "Header_Comment": "Money convertions",
+  "Header_CommentLines": [
+    "<summary>Money convertions</summary>"
+  ],
+  "Header_ClassScope": "public",
+  "Header_ClassKind": "sealed",
+  "Header_ClassBase": ""
+}

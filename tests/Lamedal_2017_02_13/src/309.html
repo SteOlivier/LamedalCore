@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classntbody\methodnt\methodntstats\methodntstats_methods.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT.MethodNTHeader;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT.MethodNTstats
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.VS_Static)]
+    public static class MethodNTstats_Methods
+    {
+
+        /// &lt;summary&gt;Simplify the methods code in order to do analysis on it.&lt;/summary&gt;
+        /// &lt;param name=&quot;sourceLines&quot;&gt;The source lines.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public static string Code_Simplify(List&lt;string&gt; sourceLines)
+        {
+            string methodBody = sourceLines.zTo_Str(&quot;&quot;.NL());
+            // Rip out single line comments.
+            methodBody = Regex.Replace(methodBody, @&quot;//.*&quot; + Environment.NewLine, Environment.NewLine);
+
+            // Rip out multi-line comments.
+            methodBody = Regex.Replace(methodBody, @&quot;/\*.*\*/&quot;, String.Empty, RegexOptions.Singleline);
+
+            // Rip out strings.
+            methodBody = Regex.Replace(methodBody, @&quot;&quot;&quot;[^&quot;&quot;]*&quot;&quot;&quot;, String.Empty);
+
+            // Rip out characters.
+            methodBody = Regex.Replace(methodBody, @&quot;&#39;[^&#39;]*&#39;&quot;, String.Empty);
+
+            // Remove double spaces and enters
+            //methodBody = Regex.Replace(methodBody, @&quot;( |\r?\n)\1+&quot;, &quot;$1&quot;);
+            methodBody = methodBody.Replace(&quot;  &quot;, &quot; &quot;);
+            methodBody = methodBody.Replace(&quot;&quot;.NL()+&quot; &quot;.NL(), &quot;&quot;.NL());
+
+            // Remove double tabs
+            methodBody = Regex.Replace(methodBody, @&quot;( |\t|\r?\n)\1+&quot;, &quot;$1&quot;);
+            return methodBody;
+        }
+
+        /// &lt;summary&gt;Total number of branching in code.&lt;/summary&gt;
+        /// &lt;param name=&quot;methodBody&quot;&gt;The method body.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public static int Code_TotalBranching(string methodBody)
+        {
+            int ifCount = Regex.Matches(methodBody, @&quot;\sif[\s\(]&quot;).Count;
+            int elseCount = Regex.Matches(methodBody, @&quot;\selse\s&quot;).Count;
+            int elseIfCount = Regex.Matches(methodBody, @&quot;\selse if[\s\(]&quot;).Count;
+            int switchCount = Regex.Matches(methodBody, @&quot;\sswitch[\s\(]&quot;).Count;
+            int caseCount = Regex.Matches(methodBody, @&quot;\scase\s[^;]*;&quot;).Count;
+            int andCount = Regex.Matches(methodBody, @&quot;\&amp;\&amp;&quot;).Count;
+            int orCount = Regex.Matches(methodBody, @&quot;\|\|&quot;).Count;
+            int catchCount = Regex.Matches(methodBody, @&quot;\scatch[\s\(]&quot;).Count;
+
+            var result = ifCount + elseCount - elseIfCount + // else if will have been counted twice already by &#39;if&#39; and &#39;else&#39;
+                switchCount + caseCount + andCount + orCount + catchCount;
+            return result;
+        }
+
+        /// &lt;summary&gt;Total number of branching in code.&lt;/summary&gt;
+        /// &lt;param name=&quot;methodBody&quot;&gt;The method body.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public static int Code_TotalLooping(string methodBody)
+        {
+            int whileCount = Regex.Matches(methodBody, @&quot;\swhile[\s\(]&quot;).Count;
+            int forCount = Regex.Matches(methodBody, @&quot;\sfor[\s\(]&quot;).Count;
+            int forEachCount = Regex.Matches(methodBody, @&quot;\sforeach[\s\(]&quot;).Count;
+
+            var result = whileCount + forCount + forEachCount;
+            return result;
+        }
+
+        /// &lt;summary&gt;
+        /// Calculates the complexity of the given method body. The higher the count the more complex the method.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;methodBody&quot;&gt;The function text.&lt;/param&gt;
+        /// &lt;returns&gt;
+        /// The calculated complexity.
+        /// &lt;/returns&gt;
+        public static int Method_Complexity(string methodBody, MethodNTHeader_ header = null)
+        {
+            // Branching
+            int branching = Code_TotalBranching(methodBody);
+
+            // Looping
+            int looping = Code_TotalLooping(methodBody);
+
+            // Complexity
+            int tertiaryCount = Regex.Matches(methodBody, @&quot;\s\?\s&quot;).Count;
+
+            // Parameters
+            int parameters = (header == null) ? 0 : header.Header_Parameters.Count;
+
+            int complexity = 1 + branching + looping +tertiaryCount + parameters;
+
+            return complexity;
+        }
+
+        /// &lt;summary&gt;Maintainability calculation of method from the method body.&lt;/summary&gt;
+        /// &lt;param name=&quot;methodBody&quot;&gt;The method body&lt;/param&gt;
+        /// &lt;param name=&quot;refMethodCount&quot;&gt;The number of reference methods found in the code.&lt;/param&gt;
+        /// &lt;param name=&quot;header&quot;&gt;The header.&lt;/param&gt;
+        /// &lt;returns&gt;int&lt;/returns&gt;
+        public static int Method_Maintainability(string methodBody, int refMethodCount, MethodNTHeader_ header = null)
+        {
+            // Ideas:  Lines of code; parameters; complexity rating; 
+            int complexity = Method_Complexity(methodBody);
+
+            // Parameters
+            double parameters = (header == null) ? 0 : header.Header_Parameters.Count;
+
+            // Lines
+            double lineBreaks = Regex.Matches(methodBody, @&quot;\r\n&quot;).Count - (refMethodCount*2);
+
+            // Factor (from parameters and lines)
+            double factor = lineBreaks/10 + parameters/3;
+
+            int result = (int)(complexity*factor);
+            return result;
+        }
+
+
+        /// &lt;summary&gt;
+        /// Parse method body.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;sourceLines&quot;&gt;The source lines.&lt;/param&gt;
+        /// &lt;param name=&quot;complexity&quot;&gt;Return the complexity&lt;/param&gt;
+        /// &lt;param name=&quot;maintainability&quot;&gt;Return the maintainability&lt;/param&gt;
+        /// &lt;param name=&quot;ReferenceCalls&quot;&gt;The reference calls.&lt;/param&gt;
+        /// &lt;param name=&quot;header&quot;&gt;&lt;/param&gt;
+        public static void Method_Stats(List&lt;string&gt; sourceLines, out int complexity, out int maintainability, 
+                    out List&lt;string&gt; ReferenceCalls, MethodNTHeader_ header = null)
+        {
+            ReferenceCalls = Method_ReferenceCalls(sourceLines);   // Calculate the reference calls
+
+            string methodBody = Code_Simplify(sourceLines);
+            complexity = Method_Complexity(methodBody);
+            maintainability = Method_Maintainability(methodBody, ReferenceCalls.Count);
+        }
+
+        /// &lt;summary&gt;Calculates Method reference calls.&lt;/summary&gt;
+        /// &lt;param name=&quot;sourceLines&quot;&gt;The source lines.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public static List&lt;string&gt; Method_ReferenceCalls(List&lt;string&gt; sourceLines)
+        {
+            var result = new List&lt;string&gt;();
+            foreach (string line in sourceLines)
+            {
+                string methodCall;
+                if (CodeLine_ReferenceCall(line, out methodCall)) result.Add(methodCall);
+            }
+            return result;
+        }
+
+        /// &lt;summary&gt;
+        /// Determines whether the code line has a method call reference. 
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;codeLine&quot;&gt;The code line&lt;/param&gt;
+        /// &lt;param name=&quot;methodCall&quot;&gt;Return the method call&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        public static bool CodeLine_ReferenceCall(string codeLine, out string methodCall)
+        {
+            // Identify method that are called
+            methodCall = &quot;&quot;;
+            var end = &quot;&quot;;
+            if (codeLine.zContains_All(&quot;(&quot;, &quot;);&quot;)) end = &quot;);&quot;;
+            else if (codeLine.zContains_All(&quot;(&quot;, &quot;) &quot;)) end = &quot;) &quot;;
+
+            if (end.Length &gt; 0)
+            {
+                // This is a method -&gt; work way back to first space from right
+                string buffer = codeLine.zvar_Id(end); // Remove all after the method call
+                buffer = buffer.Replace(&quot;if (&quot;, &quot;&quot;);   // Remove any if statements
+                buffer = buffer.zvar_Id(&quot;(&quot;); // Remove parameters
+                buffer = buffer.zSubstr_LastWord(&quot; &quot;); // Call is all after the last space
+                methodCall = buffer.zvar_Value(&quot;.&quot;);   // Method must have at least one .
+                if (methodCall == &quot;&quot;) return false;
+                if (methodCall.Contains(&quot;.&quot;) || methodCall[0] == &#39;z&#39;) return true;
+            }
+            return false;
+        }
+
+        /// &lt;summary&gt;
+        /// Parse the code line for method reference call .
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;codeLine&quot;&gt;The code line&lt;/param&gt;
+        /// &lt;returns&gt;string&lt;/returns&gt;
+        public static string CodeLine_ReferenceCall(string codeLine)
+        {
+            string methodCall;
+            if (CodeLine_ReferenceCall(codeLine, out methodCall)) return methodCall;
+            return &quot;&quot;;
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[19,9,19,10,1],[20,13,20,62,1],[22,13,22,104,1],[25,13,25,104,1],[28,13,28,81,1],[31,13,31,78,1],[35,13,35,56,1],[36,13,36,72,1],[39,13,39,78,1],[40,13,40,31,1],[41,9,41,10,1],[47,9,47,10,1],[48,13,48,74,1],[49,13,49,74,1],[50,13,50,83,1],[51,13,51,82,1],[52,13,52,80,1],[53,13,53,69,1],[54,13,54,68,1],[55,13,55,80,1],[57,13,58,75,1],[59,13,59,27,1],[60,9,60,10,1],[66,9,66,10,1],[67,13,67,80,1],[68,13,68,76,1],[69,13,69,84,1],[71,13,71,63,1],[72,13,72,27,1],[73,9,73,10,1],[83,9,83,10,1],[85,13,85,61,1],[88,13,88,57,1],[91,13,91,76,1],[94,13,94,84,1],[96,13,96,82,1],[98,13,98,31,1],[99,9,99,10,1],[107,9,107,10,1],[109,13,109,60,1],[112,13,112,87,1],[115,13,115,95,1],[118,13,118,58,1],[120,13,120,51,1],[121,13,121,27,1],[122,9,122,10,1],[135,9,135,10,1],[136,13,136,65,1],[138,13,138,60,1],[139,13,139,56,1],[140,13,140,88,1],[141,9,141,10,1],[147,9,147,10,1],[148,13,148,45,1],[149,13,149,20,1],[149,37,149,48,1],[149,22,149,33,1],[150,13,150,14,1],[152,17,152,66,1],[152,67,152,90,1],[153,13,153,14,1],[149,34,149,36,1],[154,13,154,27,1],[155,9,155,10,1],[164,9,164,10,1],[166,13,166,29,1],[167,13,167,26,1],[168,13,168,51,1],[168,52,168,63,1],[169,18,169,56,1],[169,57,169,68,1],[171,13,171,32,1],[172,13,172,14,1],[174,17,174,55,1],[175,17,175,53,1],[176,17,176,46,1],[177,17,177,55,1],[178,17,178,53,1],[179,17,179,38,1],[179,39,179,52,1],[180,17,180,70,1],[180,71,180,83,1],[181,13,181,14,1],[182,13,182,26,1],[183,9,183,10,1],[191,9,191,10,1],[193,13,193,66,1],[193,67,193,85,1],[194,13,194,23,1],[195,9,195,10,1]]);
+    </script>
+  </body>
+</html>

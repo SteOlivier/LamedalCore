@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\types\types_datetime.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+
+namespace LamedalCore.Types
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action)]
+    public sealed class Types_DateTime
+    {
+
+        /// &lt;summary&gt;
+        ///     A DateTime extension method that ages the given this.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;date&quot;&gt;The @this to act on.&lt;/param&gt;
+        /// &lt;returns&gt;An int.&lt;/returns&gt;
+        public int Age(DateTime date)
+        {
+            if (DateTime.Today.Month &lt; date.Month ||
+                DateTime.Today.Month == date.Month &amp;&amp;
+                DateTime.Today.Day &lt; date.Day) return DateTime.Today.Year - date.Year - 1;
+
+            return DateTime.Today.Year - date.Year;
+        }
+
+        /// &lt;summary&gt;
+        /// Creates the date time from java time stamp.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;javaTimeStamp&quot;&gt;The java time stamp&lt;/param&gt;
+        /// &lt;returns&gt;DateTime&lt;/returns&gt;
+        public DateTime DateTime_FromJavaTimeStamp(double javaTimeStamp)
+        {
+            // Java timestamp is millisecods past epoch
+            var dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddSeconds(Math.Round(javaTimeStamp / 1000)).ToLocalTime();
+            return dtDateTime;
+        }
+
+        /// &lt;summary&gt;
+        /// Creates the date time from unix time stamp.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;unixTimeStamp&quot;&gt;The unix time stamp&lt;/param&gt;
+        /// &lt;returns&gt;DateTime&lt;/returns&gt;
+        public DateTime DateTime_FromUnixTimeStamp(double unixTimeStamp)
+        {
+            // Unix timestamp is seconds past epoch
+            var dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dtDateTime;
+        }
+
+        /// &lt;summary&gt;
+        /// Converts the date time to unix timestamp.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;dateTime&quot;&gt;The date time&lt;/param&gt;
+        /// &lt;returns&gt;double&lt;/returns&gt;
+        public double DateTime_ToUnixTimestamp(DateTime dateTime)
+        {
+            return (dateTime - new DateTime(1970, 1, 1).ToLocalTime()).TotalSeconds;
+        }
+
+        #region Day
+        /// &lt;summary&gt;
+        ///     A DateTime extension method that return a DateTime with the time set to &quot;23:59:59:999&quot;. The last moment of
+        ///     the day. Use &quot;DateTime2&quot; column type in sql to keep the precision.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;this&quot;&gt;The @this to act on.&lt;/param&gt;
+        /// &lt;returns&gt;A DateTime of the day with the time set to &quot;23:59:59:999&quot;.&lt;/returns&gt;
+        public DateTime Day_EndOfDay(DateTime @this)
+        {
+            return new DateTime(@this.Year, @this.Month, @this.Day).AddDays(1).Subtract(new TimeSpan(0, 0, 0, 0, 1));
+        }
+
+        public DateTime Day_Future(DateTime @this, int days = 1)
+        {
+            return @this.AddDays(days);
+        }
+
+        /// &lt;summary&gt;
+        ///     A DateTime extension method that tomorrows the given this.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;this&quot;&gt;The @this to act on.&lt;/param&gt;
+        /// &lt;returns&gt;Tomorrow date at same time.&lt;/returns&gt;
+        public DateTime Day_Tomorrow(DateTime @this)
+        {
+            return Day_Future(@this, 1);
+        }
+
+        /// &lt;summary&gt;
+        ///     A DateTime extension method that yesterdays the given this.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;this&quot;&gt;The @this to act on.&lt;/param&gt;
+        /// &lt;returns&gt;Yesterday date at same time.&lt;/returns&gt;
+        public DateTime Day_Yesterday(DateTime @this)
+        {
+            return Day_Future(@this, -1);
+        }
+        #endregion
+
+        #region EndOf
+        /// &lt;summary&gt;
+        ///     A DateTime extension method that return a DateTime of the last day of the month with the time set to
+        ///     &quot;23:59:59:999&quot;. The last moment of the last day of the month.  Use &quot;DateTime2&quot; column type in sql to keep the
+        ///     precision.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;this&quot;&gt;The @this to act on.&lt;/param&gt;
+        /// &lt;returns&gt;A DateTime of the last day of the month with the time set to &quot;23:59:59:999&quot;.&lt;/returns&gt;
+        [BlueprintRule_MethodAliasDef(MirrorMethodName = &quot;Month_LastDay&quot;)]
+        public DateTime End_OfMonth(DateTime @this)
+        {
+            return new DateTime(@this.Year, @this.Month, 1).AddMonths(1).Subtract(new TimeSpan(0, 0, 0, 0, 1));
+        }
+
+        /// &lt;summary&gt;
+        ///     A System.DateTime extension method that ends of week.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;dt&quot;&gt;Date/Time of the dt.&lt;/param&gt;
+        /// &lt;param name=&quot;startDayOfWeek&quot;&gt;(Optional) the start day of week.&lt;/param&gt;
+        /// &lt;returns&gt;A DateTime.&lt;/returns&gt;
+        [BlueprintRule_MethodAliasDef(MirrorMethodName = &quot;Week_LastDay&quot;)]
+        public DateTime End_OfWeek(DateTime dt, DayOfWeek startDayOfWeek = DayOfWeek.Sunday)
+        {
+            var end = dt;
+            var endDayOfWeek = startDayOfWeek - 1;
+            if (endDayOfWeek &lt; 0)
+            {
+                endDayOfWeek = DayOfWeek.Saturday;
+            }
+
+            if (end.DayOfWeek != endDayOfWeek)
+            {
+                if (endDayOfWeek &lt; end.DayOfWeek)
+                {
+                    end = end.AddDays(7 - (end.DayOfWeek - endDayOfWeek));
+                }
+                else
+                {
+                    end = end.AddDays(endDayOfWeek - end.DayOfWeek);
+                }
+            }
+
+            return new DateTime(end.Year, end.Month, end.Day, 23, 59, 59, 999);
+        }
+
+        ///// &lt;summary&gt;
+        /////     A DateTime extension method that last day of week.
+        ///// &lt;/summary&gt;
+        ///// &lt;param name=&quot;this&quot;&gt;The @this to act on.&lt;/param&gt;
+        ///// &lt;returns&gt;A DateTime.&lt;/returns&gt;
+        //public DateTime End_OfWeek(DateTime @this)
+        //{
+        //    return new DateTime(@this.Year, @this.Month, @this.Day).AddDays(6 - (int)@this.DayOfWeek);
+        //}
+
+        /// &lt;summary&gt;
+        ///     A DateTime extension method that return a DateTime of the last day of the year with the time set to
+        ///     &quot;23:59:59:999&quot;. The last moment of the last day of the year.  Use &quot;DateTime2&quot; column type in sql to keep the
+        ///     precision.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;this&quot;&gt;The @this to act on.&lt;/param&gt;
+        /// &lt;returns&gt;A DateTime of the last day of the year with the time set to &quot;23:59:59:999&quot;.&lt;/returns&gt;
+        [BlueprintRule_MethodAliasDef(MirrorMethodName = &quot;Year_LastDay&quot;)]
+        public DateTime End_OfYear(DateTime @this)
+        {
+            return new DateTime(@this.Year, 1, 1).AddYears(1).Subtract(new TimeSpan(0, 0, 0, 0, 1));
+        }
+        #endregion
+
+        #region First
+        /// &lt;summary&gt;
+        /// Gets a &lt;see cref=&quot;DateTime&quot;/&gt; that represents the first day of 
+        /// the month of this &lt;see cref=&quot;DateTime&quot;/&gt;.
+        /// &lt;/summary&gt;
+        [BlueprintRule_MethodAliasDef(MirrorMethodName = &quot;Month_FirstDay&quot;)]
+        public DateTime First_DayOfMonth(DateTime time)
+        {
+            return new DateTime(time.Year, time.Month, 1, time.Hour, time.Minute, time.Second, time.Millisecond,
+                time.Kind);
+        }
+
+        /// &lt;summary&gt;
+        /// Gets a &lt;see cref=&quot;DateTime&quot;/&gt; that represents the first day of 
+        /// the quarter of this &lt;see cref=&quot;DateTime&quot;/&gt;.
+        /// &lt;/summary&gt;
+        [BlueprintRule_MethodAliasDef(MirrorMethodName = &quot;Quarter_FirstDay&quot;)]
+        public DateTime First_DayOfQuarter(DateTime time)
+        {
+            return new DateTime(time.Year, (Quarter_Get(time) - 1) * 3 + 1, 1, time.Hour, time.Minute, time.Second,
+                time.Millisecond, time.Kind);
+        }
+
+        /// &lt;summary&gt;
+        /// Gets a &lt;see cref=&quot;DateTime&quot;/&gt; that represents the first day of 
+        /// the year of this &lt;see cref=&quot;DateTime&quot;/&gt;.
+        /// &lt;/summary&gt;
+        [BlueprintRule_MethodAliasDef(MirrorMethodName = &quot;Year_FirstDay&quot;)]
+        public DateTime First_DayOfYear(DateTime time)
+        {
+            return new DateTime(time.Year, 1, 1, time.Hour, time.Minute, time.Second, time.Millisecond, time.Kind);
+        }
+        #endregion
+
+        #region Is
+        /// &lt;summary&gt;
+        ///     A DateTime extension method that query if &#39;@this&#39; is afternoon.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;this&quot;&gt;The @this to act on.&lt;/param&gt;
+        /// &lt;returns&gt;true if afternoon, false if not.&lt;/returns&gt;
+        public bool IsAfternoon(DateTime @this)
+        {
+            return @this.TimeOfDay &gt;= new DateTime(2000, 1, 1, 12, 0, 0).TimeOfDay;
+        }
+
+        /// &lt;summary&gt;
+        /// A T extension method that check if the value is between inclusively the minValue and maxValue.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;this&quot;&gt;The @this to act on.&lt;/param&gt;
+        /// &lt;param name=&quot;minValue&quot;&gt;The minimum value.&lt;/param&gt;
+        /// &lt;param name=&quot;maxValue&quot;&gt;The maximum value.&lt;/param&gt;
+        /// &lt;returns&gt;
+        /// true if the value is between inclusively the minValue and maxValue, otherwise false.
+        /// &lt;/returns&gt;
+        /// ###
+        public bool IsInRange(DateTime @this, DateTime minValue, DateTime maxValue)
+        {
+            if (minValue.CompareTo(maxValue) &lt;= 0)
+                 return @this.CompareTo(minValue) &gt;= 0 &amp;&amp; @this.CompareTo(maxValue) &lt;= 0;
+            else return IsInRange(@this, maxValue, minValue);
+        }
+
+        /// &lt;summary&gt;
+        ///     A DateTime extension method that query if &#39;@this&#39; is morning.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;this&quot;&gt;The @this to act on.&lt;/param&gt;
+        /// &lt;returns&gt;true if morning, false if not.&lt;/returns&gt;
+        public bool IsMorning(DateTime @this)
+        {
+            return @this.TimeOfDay &lt; new DateTime(2000, 1, 1, 12, 0, 0).TimeOfDay;
+        }
+
+        /// &lt;summary&gt;
+        ///     A DateTime extension method that query if &#39;@this&#39; is today.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;this&quot;&gt;The @this to act on.&lt;/param&gt;
+        /// &lt;returns&gt;true if today, false if not.&lt;/returns&gt;
+        public bool IsToday(DateTime @this)
+        {
+            return @this.Date == DateTime.Today;
+        }
+
+        /// &lt;summary&gt;
+        ///     A DateTime extension method that query if &#39;@this&#39; is a week day.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;this&quot;&gt;The @this to act on.&lt;/param&gt;
+        /// &lt;returns&gt;true if &#39;@this&#39; is a week day, false if not.&lt;/returns&gt;
+        public bool IsWeekDay(DateTime @this)
+        {
+            return !(@this.DayOfWeek == DayOfWeek.Saturday || @this.DayOfWeek == DayOfWeek.Sunday);
+        }
+
+        /// &lt;summary&gt;
+        ///     A DateTime extension method that query if &#39;@this&#39; is a weekend day.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;this&quot;&gt;The @this to act on.&lt;/param&gt;
+        /// &lt;returns&gt;true if &#39;@this&#39; is a weekend day, false if not.&lt;/returns&gt;
+        public bool IsWeekendDay(DateTime @this)
+        {
+            return (@this.DayOfWeek == DayOfWeek.Saturday || @this.DayOfWeek == DayOfWeek.Sunday);
+        }
+        #endregion
+
+        /// &lt;summary&gt;
+        /// Determines the quarter (from 1 to 4) to which the date belongs.
+        /// &lt;/summary&gt;
+        public int Quarter_Get(DateTime date)
+        {
+            return ((date.Month - 1) / 3) + 1;
+        }
+
+        /// &lt;summary&gt;Convert date time to simple readable time.&lt;/summary&gt;
+        /// &lt;param name=&quot;value&quot;&gt;The value.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string To_StrReadableTime(DateTime value)
+        {
+            TimeSpan span = DateTime.Now.Subtract(value);
+            const string plural = &quot;s&quot;;
+
+            //if (span.Days &gt; 7) return value.ToShortDateString();
+            if (span.Days &gt; 7) return value.ToString(&quot;d&quot;);
+
+            switch (span.Days)
+            {
+                case 0:
+                    switch (span.Hours)
+                    {
+                        case 0:
+                            if (span.Minutes == 0)
+                            {
+                                return span.Seconds &lt;= 0
+                                           ? &quot;now&quot;
+                                           : string.Format(&quot;{0} second{1} ago&quot;, span.Seconds, span.Seconds != 1 ? plural : string.Empty);
+                            }
+                            return string.Format(&quot;{0} minute{1} ago&quot;, span.Minutes, span.Minutes != 1 ? plural : string.Empty);
+                        default: return string.Format(&quot;{0} hour{1} ago&quot;, span.Hours, span.Hours != 1 ? plural : string.Empty);
+                    }
+                default: return string.Format(&quot;{0} day{1} ago&quot;, span.Days, span.Days != 1 ? plural : string.Empty);
+            }
+        }
+
+        /// &lt;summary&gt;Trims to the nearest milli-second.&lt;/summary&gt;
+        /// &lt;param name=&quot;time&quot;&gt;The date time&lt;/param&gt;
+        /// &lt;param name=&quot;trim&quot;&gt;The trim.&lt;/param&gt;
+        /// &lt;returns&gt;DateTime&lt;/returns&gt;
+        public DateTime Trim(DateTime time, enDateTimeTrim trim = enDateTimeTrim.Trim2Second)
+        {
+            switch (trim)
+            {
+               case enDateTimeTrim.Trim2Day:  return time.Date;
+               case enDateTimeTrim.Trim2Hour: return Trim_Setup(time, TimeSpan.FromHours(1));
+               case enDateTimeTrim.Trim2Minute: return Trim_Setup(time, TimeSpan.FromMinutes(1));
+               case enDateTimeTrim.Trim2Second: return Trim_Setup(time, TimeSpan.FromSeconds(1));
+               case enDateTimeTrim.Trim2MilliSecond: return Trim_Setup(time, TimeSpan.FromMilliseconds(1));
+            }
+            return time.Date;
+        }
+
+        /// &lt;summary&gt;Trim the time to the specified timespan.&lt;/summary&gt;
+        /// &lt;param name=&quot;dateTime&quot;&gt;The date time.&lt;/param&gt;
+        /// &lt;param name=&quot;timeSpan&quot;&gt;The time span.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        private DateTime Trim_Setup(DateTime dateTime, TimeSpan? timeSpan = null)
+        {
+            var timespan1 = timeSpan ?? TimeSpan.Zero;
+
+            if (timespan1 == TimeSpan.Zero) return dateTime; // Or could throw an ArgumentException
+            return dateTime.AddTicks(-(dateTime.Ticks % timespan1.Ticks));
+        }
+
+        /// &lt;summary&gt;Return the Null time value.&lt;/summary&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public DateTime null_ { get {return default(DateTime);} }
+        
+        /// &lt;summary&gt;Determines whether the specified time is null.&lt;/summary&gt;
+        /// &lt;param name=&quot;time&quot;&gt;The time.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool IsNull(DateTime time)
+        {
+            return (time == null_);
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[22,13,22,52,0],[288,32,288,59,0],[297,29,297,30,0],[298,33,300,138,0],[321,54,321,108,0],[323,13,323,30,0],[334,45,334,61,0],[346,9,346,10,0],[347,13,347,36,0],[348,9,348,10,0],[17,9,17,10,1],[18,13,20,47,1],[20,48,20,91,1],[23,9,23,10,1],[31,9,31,10,1],[33,13,33,92,1],[34,13,34,96,1],[35,13,35,31,1],[36,9,36,10,1],[44,9,44,10,1],[46,13,46,92,1],[47,13,47,77,1],[48,13,48,31,1],[49,9,49,10,1],[57,9,57,10,1],[58,13,58,85,1],[59,9,59,10,1],[69,9,69,10,1],[70,13,70,118,1],[71,9,71,10,1],[74,9,74,10,1],[75,13,75,40,1],[76,9,76,10,1],[84,9,84,10,1],[85,13,85,41,1],[86,9,86,10,1],[94,9,94,10,1],[95,13,95,42,1],[96,9,96,10,1],[109,9,109,10,1],[110,13,110,112,1],[111,9,111,10,1],[121,9,121,10,1],[122,13,122,26,1],[123,13,123,51,1],[124,13,124,34,1],[125,13,125,14,1],[126,17,126,51,1],[127,13,127,14,1],[129,13,129,47,1],[130,13,130,14,1],[131,17,131,50,1],[132,17,132,18,1],[133,21,133,75,1],[134,17,134,18,1],[136,17,136,18,1],[137,21,137,69,1],[138,17,138,18,1],[139,13,139,14,1],[141,13,141,80,1],[142,9,142,10,1],[163,9,163,10,1],[164,13,164,101,1],[165,9,165,10,1],[175,9,175,10,1],[176,13,177,28,1],[178,9,178,10,1],[186,9,186,10,1],[187,13,188,46,1],[189,9,189,10,1],[197,9,197,10,1],[198,13,198,116,1],[199,9,199,10,1],[209,9,209,10,1],[210,13,210,84,1],[211,9,211,10,1],[224,9,224,10,1],[225,13,225,51,1],[226,18,226,90,1],[227,18,227,62,1],[228,9,228,10,1],[236,9,236,10,1],[237,13,237,83,1],[238,9,238,10,1],[246,9,246,10,1],[247,13,247,49,1],[248,9,248,10,1],[256,9,256,10,1],[257,13,257,100,1],[258,9,258,10,1],[266,9,266,10,1],[267,13,267,99,1],[268,9,268,10,1],[275,9,275,10,1],[276,13,276,47,1],[277,9,277,10,1],[283,9,283,10,1],[284,13,284,58,1],[288,13,288,31,1],[290,13,290,31,1],[293,21,293,40,1],[296,29,296,51,1],[302,29,302,128,1],[303,34,303,127,1],[305,26,305,116,1],[307,9,307,10,1],[314,9,314,10,1],[315,13,315,26,1],[317,47,317,64,1],[318,47,318,94,1],[319,49,319,98,1],[320,49,320,98,1],[324,9,324,10,1],[331,9,331,10,1],[332,13,332,55,1],[334,13,334,44,1],[335,13,335,75,1],[336,9,336,10,1],[340,37,340,38,1],[340,38,340,63,1],[340,63,340,64,1]]);
+    </script>
+  </body>
+</html>

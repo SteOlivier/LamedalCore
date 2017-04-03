@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classntattribute\classntblueprintrule\classntblueprintrule_methods.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttributes;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttribute.ClassNTBlueprintRule
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.VS_Static)]
+    public static class ClassNTBlueprintRule_Methods
+    {
+        public static bool BlueprintRule_Attributes(string attributeCode, out string name, out List&lt;string&gt; parameters, out enBlueprintClassNetworkType classNetworkType,
+            out string ignore1, out string ignore2, out string ignore3, out string ignore4)
+        {
+            ClassNTAttributes_Methods.Attribute_Parts(attributeCode, out name, out parameters);
+
+            // Default values
+            classNetworkType = enBlueprintClassNetworkType.Undefined;
+            ignore1 = null;
+            ignore2 = null;
+            ignore3 = null;
+            ignore4 = null;
+
+            if (BlueprintRuleClass(name) == false) return false;  //&lt;================================================
+
+            // Test the parameters
+            // The first parameter is the enBlueprintClassNetworkType
+            var parm1 = parameters[0];
+            classNetworkType = parm1.zEnum_To_EnumValue&lt;enBlueprintClassNetworkType&gt;();
+            //var value = parm1.zvar_Value(&quot;.&quot;);
+            //classNetworkType = value.zEnum_To_EnumValue&lt;enBlueprintClassNetworkType&gt;();
+
+            foreach (string parameter in parameters)
+            {
+                if (parameter.Contains(&quot;Ignore_Namespace1&quot;)) ignore1 = parameter.zvar_Value(&quot;=&quot;).zRemove_DoubleQuotes();
+                if (parameter.Contains(&quot;Ignore_Namespace2&quot;)) ignore2 = parameter.zvar_Value(&quot;=&quot;).zRemove_DoubleQuotes();
+                if (parameter.Contains(&quot;Ignore_Namespace3&quot;)) ignore3 = parameter.zvar_Value(&quot;=&quot;).zRemove_DoubleQuotes();
+                if (parameter.Contains(&quot;Ignore_Namespace4&quot;)) ignore4 = parameter.zvar_Value(&quot;=&quot;).zRemove_DoubleQuotes();
+            }
+            return true;
+        }
+
+        private static bool BlueprintRuleClass(string name)
+        {
+            if (_BlueprintRuleClass1 == null)
+            {
+                _BlueprintRuleClass1 = typeof(BlueprintRule_ClassAttribute).Name;
+                _BlueprintRuleClass2 = _BlueprintRuleClass1.Replace(&quot;Attribute&quot;, &quot;&quot;);
+            }
+            return (name == _BlueprintRuleClass1 || name == _BlueprintRuleClass2);
+        }
+        private static string _BlueprintRuleClass1 = null;
+        private static string _BlueprintRuleClass2 = null;
+
+        public static void BlueprintRule_AttributeParameters(List&lt;string&gt; parameters, out string defaultGroup, out Type defaultType, out string groupName, out bool ignoreGroup, out bool ignorePath, out bool includeObjects, out string ShortcutClass)
+        {
+            defaultType = null;
+            defaultGroup = null;
+            groupName = null;
+            ignoreGroup = false;
+            ignorePath = false;
+            includeObjects = false;
+            ShortcutClass = null;
+
+            foreach (string parameter in parameters)
+            {
+                if (parameter.Contains(&quot;DefaultType&quot;))
+                {
+                    var type = parameter.zvar_Value(&quot;=&quot;);
+                    type = type.Replace(&quot;typeof(&quot;, &quot;&quot;).Replace(&quot;)&quot;, &quot;&quot;);
+                    defaultType = 1f.zTypes().Convert.Type_FromStr(type);
+                }
+                if (parameter.Contains(&quot;DefaultGroup&quot;)) defaultGroup = parameter.zvar_Value(&quot;=&quot;).zRemove_DoubleQuotes().Replace(&quot; &quot;, &quot;_&quot;);
+                if (parameter.Contains(&quot;GroupName&quot;)) groupName = parameter.zvar_Value(&quot;=&quot;).zRemove_DoubleQuotes().Replace(&quot; &quot;, &quot;_&quot;);
+                if (parameter.Contains(&quot;IgnoreGroup&quot;)) ignoreGroup = parameter.zvar_Value(&quot;=&quot;).zTo_Bool();
+                if (parameter.Contains(&quot;IgnoreGroupPath&quot;)) ignorePath = parameter.zvar_Value(&quot;=&quot;).zTo_Bool();
+                if (parameter.Contains(&quot;IncludeObjects&quot;)) includeObjects = parameter.zvar_Value(&quot;=&quot;).zTo_Bool();
+                if (parameter.Contains(&quot;ShortcutClass&quot;)) ShortcutClass = parameter.zvar_Value(&quot;=&quot;).zRemove_DoubleQuotes().Replace(&quot; &quot;, &quot;_&quot;);
+            }
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[78,59,78,113,0],[15,9,15,10,1],[16,13,16,96,1],[19,13,19,70,1],[20,13,20,28,1],[21,13,21,28,1],[22,13,22,28,1],[23,13,23,28,1],[25,13,25,51,1],[25,52,25,65,1],[29,13,29,39,1],[30,13,30,88,1],[34,13,34,20,1],[34,42,34,52,1],[34,22,34,38,1],[35,13,35,14,1],[36,17,36,61,1],[36,62,36,121,1],[37,17,37,61,1],[37,62,37,121,1],[38,17,38,61,1],[38,62,38,121,1],[39,17,39,61,1],[39,62,39,121,1],[40,13,40,14,1],[34,39,34,41,1],[41,13,41,25,1],[42,9,42,10,1],[45,9,45,10,1],[46,13,46,46,1],[47,13,47,14,1],[48,17,48,82,1],[49,17,49,86,1],[50,13,50,14,1],[51,13,51,83,1],[52,9,52,10,1],[57,9,57,10,1],[58,13,58,32,1],[59,13,59,33,1],[60,13,60,30,1],[61,13,61,33,1],[62,13,62,32,1],[63,13,63,36,1],[64,13,64,34,1],[66,13,66,20,1],[66,42,66,52,1],[66,22,66,38,1],[67,13,67,14,1],[68,17,68,55,1],[69,17,69,18,1],[70,21,70,58,1],[71,21,71,73,1],[72,21,72,74,1],[73,17,73,18,1],[74,17,74,56,1],[74,57,74,139,1],[75,17,75,53,1],[75,54,75,133,1],[76,17,76,55,1],[76,56,76,107,1],[77,17,77,59,1],[77,60,77,110,1],[78,17,78,58,1],[79,17,79,57,1],[79,58,79,141,1],[80,13,80,14,1],[66,39,66,41,1],[81,9,81,10,1],[53,9,53,59,1],[54,9,54,59,1]]);
+    </script>
+  </body>
+</html>

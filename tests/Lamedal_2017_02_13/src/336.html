@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\io\io_search.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using LamedalCore.domain.Attributes;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.IO
+{
+    public sealed class IO_Search
+    {
+        private readonly IO_ _io = LamedalCore_.Instance.lib.IO;
+
+        /// &lt;summary&gt;
+        /// Return the Files in the specified folder.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;folder&quot;&gt;The folder.&lt;/param&gt;
+        /// &lt;param name=&quot;searchPattern&quot;&gt;The search criteria.&lt;/param&gt;
+        /// &lt;param name=&quot;searchOption&quot;&gt;The search option.&lt;/param&gt;
+        /// &lt;returns&gt;System.String[].&lt;/returns&gt;
+        public string[] Files(string folder, string searchPattern = &quot;*.*&quot;, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+        {
+            return Directory.GetFiles(folder, searchPattern, searchOption);
+        }
+
+        /// &lt;summary&gt;
+        /// Return the Folders in the specified folder.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;folder&quot;&gt;The folder.&lt;/param&gt;
+        /// &lt;param name=&quot;searchPattern&quot;&gt;The search pattern.&lt;/param&gt;
+        /// &lt;param name=&quot;searchOption&quot;&gt;The search option.&lt;/param&gt;
+        /// &lt;returns&gt;System.String[].&lt;/returns&gt;
+        public string[] Folders(string folder, string searchPattern = &quot;*.*&quot;, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+        {
+            return Directory.GetDirectories(folder, searchPattern, searchOption);
+        }
+
+        /// &lt;summary&gt;
+        /// Determines whether file exist in the search subfolders.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;searchFolders&quot;&gt;The search folders&lt;/param&gt;
+        /// &lt;param name=&quot;filename&quot;&gt;The filename&lt;/param&gt;
+        /// &lt;param name=&quot;folderAndFileFound&quot;&gt;Return the folder + file found.&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        [BlueprintRule_MethodAliasDef(MirrorClass = typeof(IO_File), MirrorParameter1 = &quot;filename&quot;)]
+        public bool Search_FileInSubFolders(IList&lt;string&gt; searchFolders, string filename, out string folderAndFileFound)
+        {
+            if (filename.zIsNullOrEmpty()) throw new ArgumentNullException(nameof(filename));
+
+            foreach (var folder in searchFolders)
+            {
+                folderAndFileFound = folder + filename;
+                if (_io.File.Exists(folderAndFileFound)) return true;
+            }
+            folderAndFileFound = &quot;&quot;;
+            return false;
+        }
+
+        /// &lt;summary&gt;
+        /// Function to sub files from the path.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;path&quot;&gt;The path&lt;/param&gt;
+        /// &lt;param name=&quot;searchPattern&quot;&gt;The search pattern setting. Default value = &amp;quot;*&amp;quot;.&lt;/param&gt;
+        /// &lt;param name=&quot;searchOption&quot;&gt;The search option setting. Default value = SearchOption.TopDirectoryOnly.&lt;/param&gt;
+        /// &lt;returns&gt;IEnumerable&lt;string/&gt;&lt;/returns&gt;
+        public IList&lt;string&gt; Search_Files(string path, string searchPattern = &quot;*&quot;, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+        {
+            var result = Directory.GetFiles(path, searchPattern, searchOption).ToList();
+            return result;
+        }
+        /// &lt;summary&gt;Formats the list and change all to &#39;/&#39;.&lt;/summary&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        private Func&lt;string, string&gt; Format2Slash_InList()
+        {
+            //return x =&gt; IO.Parts._Format2Slash(x);  // This do not work
+            return x =&gt; x.Replace(@&quot;\&quot;, &quot;/&quot;) + &quot;/&quot;;
+        }
+        /// &lt;summary&gt;
+        /// Function to sub folders from the path.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;path&quot;&gt;The path&lt;/param&gt;
+        /// &lt;param name=&quot;searchPattern&quot;&gt;The search pattern setting. Default value = &amp;quot;*&amp;quot;.&lt;/param&gt;
+        /// &lt;param name=&quot;searchOption&quot;&gt;The search option setting. Default value = SearchOption.TopDirectoryOnly.&lt;/param&gt;
+        /// &lt;returns&gt;IEnumerable&lt;string/&gt;&lt;/returns&gt;
+        public IList&lt;string&gt; Search_Folders(string path, string searchPattern = &quot;*&quot;, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+        {
+            var result = Directory.GetDirectories(path, searchPattern, searchOption);
+            return result.Select(Format2Slash_InList()).ToList();
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[23,9,23,10,0],[24,13,24,76,0],[25,9,25,10,0],[35,9,35,10,0],[36,13,36,82,0],[37,9,37,10,0],[49,44,49,94,0],[55,13,55,14,0],[56,13,56,37,0],[57,13,57,26,0],[48,9,48,10,1],[49,13,49,43,1],[51,13,51,20,1],[51,36,51,49,1],[51,22,51,32,1],[52,13,52,14,1],[53,17,53,56,1],[54,17,54,57,1],[54,58,54,70,1],[51,33,51,35,1],[58,9,58,10,1],[68,9,68,10,1],[69,13,69,89,1],[70,13,70,27,1],[71,9,71,10,1],[75,9,75,10,1],[77,13,77,25,1],[77,51,77,52,1],[78,9,78,10,1],[87,9,87,10,1],[88,13,88,86,1],[89,13,89,66,1],[90,9,90,10,1],[13,9,13,65,1],[77,25,77,51,1]]);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classntbody\methodnt\methodntheader\methodntheader_parameter\methodntheader_parameter_methods.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System.Collections.Generic;
+using System.Linq;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT.MethodNTHeader.MethodNTHeader_Parameter
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.VS_Static)]
+    public static class MethodNTHeader_Parameter_Methods
+    {
+        #region Parameters_Parse
+
+        /// &lt;summary&gt;
+        /// Parse the method parameters.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;headerOriginalLine&quot;&gt;The header original line.&lt;/param&gt;
+        /// &lt;param name=&quot;parametersLines&quot;&gt;The parameters line.&lt;/param&gt;
+        /// &lt;returns&gt;false if there was an error&lt;/returns&gt;
+        public static bool Parameters_Parse(string headerOriginalLine, out List&lt;string&gt; parametersLines)
+        {
+            //MethodDef_ method, List&lt;string&gt; parameterXMLHelpList
+
+            // Get the parameters
+            // -----------------------
+            // public override void Trace_Application(string header, DateTime starttime = default(DateTime), params object[] theDetail)
+            string buffer = headerOriginalLine;
+            string pre = &quot;(&quot;.zVar_Next(ref buffer);
+
+            // Parameter line
+            int pos1 = buffer.LastIndexOf(&quot;)&quot;);
+            int pos2 = buffer.LastIndexOf(&quot;) :&quot;);
+            int pos = (pos2 &gt; 0) ? pos2 : pos1;
+            string parametersStr = buffer.zSubStr_Save(0, pos);
+            parametersLines = Parameter_Parse2StrList(parametersStr);
+
+            // Check for error condition
+            buffer = buffer.Substring(pos + 1);
+            buffer = buffer.Trim();
+            if (buffer != &quot;&quot; &amp;&amp; !buffer.Contains(&quot;:&quot;) &amp;&amp; (buffer != &quot;{&quot; &amp;&amp; buffer != &quot;;&quot;) &amp;&amp;
+                buffer.zContains_All(&quot;{&quot;, &quot;}&quot;) == false)
+            {
+                if (!buffer.Contains(&quot;//&quot;) || buffer.Substring(0, 2) != &quot;//&quot;) return false; // This is an error - add unit test for this line
+            }
+
+            return true;
+        }
+
+        /// &lt;summary&gt;
+        /// Converts the parameters line into a parameter string list.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;lineOfAllParameters&quot;&gt;The line of all parameters.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public static List&lt;string&gt; Parameter_Parse2StrList(string lineOfAllParameters)
+        {
+            var result = new List&lt;string&gt;();
+            string parms = lineOfAllParameters;
+            while (parms.Length &gt; 0)
+            {
+                // Get the next parameter
+                string parm = &quot;,&quot;.zVar_Next(ref parms);
+                if (parm.Contains(&quot;&lt;&quot;) &amp;&amp; parm.Contains(&quot;&gt;&quot;) == false)
+                {
+                    parm += &quot;, &quot; + &quot;&gt;&quot;.zVar_Next(ref parms) + &quot;&gt;&quot;;
+                    if (parm.zSubStr_Right(1) != &quot; &quot;) parm += &quot; &quot;;
+                    parm += &quot;,&quot;.zVar_Next(ref parms);
+                    // This is a dictionary -&gt; move to the next comment to get the full parameter
+                }
+                parm = parm.Replace(&quot;[NotNull]&quot;, &quot;&quot;).Trim();
+                result.Add(parm);
+            }
+            return result;
+        }
+
+
+
+        #endregion
+
+        /// &lt;summary&gt;
+        /// Return parameter parts.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;paramLine&quot;&gt;The parameter line reference variable&lt;/param&gt;
+        /// &lt;param name=&quot;isThis&quot;&gt;&lt;/param&gt;
+        /// &lt;param name=&quot;refType&quot;&gt;&lt;/param&gt;
+        /// &lt;param name=&quot;typeName&quot;&gt;Return the type name&lt;/param&gt;
+        /// &lt;param name=&quot;name&quot;&gt;The name.&lt;/param&gt;
+        /// &lt;param name=&quot;optionalValue&quot;&gt;The optional value.&lt;/param&gt;
+        public static void Parameter_Parts(ref string paramLine, out bool isThis, out enParameterRefType refType, out string typeName, out string name, out string optionalValue)
+        {
+            var defBuffer = paramLine;
+            if (defBuffer.IndexOf(&quot;this &quot;) == 0)
+            {
+                isThis = true;
+                &quot;this &quot;.zVar_Next(ref defBuffer);
+            }
+            else isThis = false;
+
+            // Type ---------------------------------
+            typeName = &quot; &quot;.zVar_Next(ref defBuffer);
+
+            switch (typeName)
+            {
+                case &quot;params&quot;:
+                    {
+                        refType = enParameterRefType.ParamArray;
+                        typeName = &quot; &quot;.zVar_Next(ref defBuffer);
+                        break;
+                    }
+                case &quot;out&quot;:
+                    {
+                        refType = enParameterRefType.Output;
+                        typeName = &quot; &quot;.zVar_Next(ref defBuffer);
+                        break;
+                    }
+                case &quot;ref&quot;:
+                    {
+                        refType = enParameterRefType.ByReference;
+                        typeName = &quot; &quot;.zVar_Next(ref defBuffer);
+                        break;
+                    }
+
+                default:
+                    refType = enParameterRefType.ByValue;
+                    break;
+            }
+
+            if (typeName.Contains(&quot;&lt;&quot;) &amp;&amp; typeName.Contains(&quot;&gt;&quot;) == false)
+            {
+                typeName += &quot; &quot; + &quot;&gt;&quot;.zVar_Next(ref defBuffer) + &quot;&gt;&quot;;
+                //if (typeName.zSubStr_Right(1) != &quot; &quot;) typeName += &quot; &quot;;
+                //typeName += &quot;,&quot;.zVar_Next(ref typeName); // This is a dictionary -&gt; move to the next comment to get the full parameter
+            }
+
+            //if (typeName.Contains(&quot;Dictionary&lt;&quot;))
+            //{
+            //    typeName = &quot;Dictionary&quot;;
+            //    if (defBuffer.Contains(&quot;&gt;&quot;)) &quot;&gt;&quot;.zVar_Next(ref defBuffer); // Move past dictionary
+            //} else if (typeName.Contains(&quot;Tuple&lt;&quot;))
+            //{
+            //    typeName = &quot;Tuple&quot;;
+            //    if (defBuffer.Contains(&quot;&gt;&quot;)) &quot;&gt;&quot;.zVar_Next(ref defBuffer); // Move past tuple
+            //}
+
+            // Name ---------------------
+            defBuffer = defBuffer.Replace(&quot;[]&quot;, &quot;&quot;);  // Remove array chars fromt the name
+            defBuffer = defBuffer.TrimStart();        // Remove starting spaces
+            name = &quot; &quot;.zVar_Next(ref defBuffer);
+
+            optionalValue = defBuffer.zvar_Value(&quot;=&quot;);
+            if (optionalValue == &quot;&quot;) optionalValue = null;  // There can be confusion between &quot;&quot; default value and no default value. It is therefor better to assign a null for novalue.
+
+            paramLine = defBuffer;
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[42,13,42,14,0],[43,17,43,78,0],[43,79,43,92,0],[44,13,44,14,0],[21,9,21,10,1],[27,13,27,48,1],[28,13,28,52,1],[31,13,31,48,1],[32,13,32,50,1],[33,13,33,48,1],[34,13,34,64,1],[35,13,35,70,1],[38,13,38,48,1],[39,13,39,36,1],[40,13,41,57,1],[46,13,46,25,1],[47,9,47,10,1],[55,9,55,10,1],[56,13,56,45,1],[57,13,57,48,1],[59,13,59,14,1],[61,17,61,56,1],[62,17,62,71,1],[63,17,63,18,1],[64,21,64,67,1],[65,21,65,54,1],[65,55,65,67,1],[66,21,66,54,1],[68,17,68,18,1],[69,17,69,61,1],[70,17,70,34,1],[71,13,71,14,1],[58,13,58,37,1],[72,13,72,27,1],[73,9,73,10,1],[89,9,89,10,1],[90,13,90,39,1],[91,13,91,49,1],[92,13,92,14,1],[93,17,93,31,1],[94,17,94,50,1],[95,13,95,14,1],[96,18,96,33,1],[99,13,99,53,1],[101,13,101,30,1],[104,21,104,22,1],[105,25,105,65,1],[106,25,106,65,1],[107,25,107,31,1],[110,21,110,22,1],[111,25,111,61,1],[112,25,112,65,1],[113,25,113,31,1],[116,21,116,22,1],[117,25,117,66,1],[118,25,118,65,1],[119,25,119,31,1],[123,21,123,58,1],[124,21,124,27,1],[127,13,127,75,1],[128,13,128,14,1],[129,17,129,70,1],[132,13,132,14,1],[145,13,145,53,1],[146,13,146,47,1],[147,13,147,49,1],[149,13,149,55,1],[150,13,150,37,1],[150,38,150,59,1],[152,13,152,35,1],[153,9,153,10,1]]);
+    </script>
+  </body>
+</html>

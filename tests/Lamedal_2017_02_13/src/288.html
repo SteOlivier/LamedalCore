@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\words\wordslist\wordslist_abbreviations.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System.Collections.Generic;
+
+namespace LamedalCore.lib.Words.WordsList
+{
+    public sealed class WordsList_Abbreviations
+    {
+        private static List&lt;string&gt; _list;
+        public static IList&lt;string&gt; AbbreviationsList_Create()
+        {
+           if (_list != null) return _list;
+           _list = new List&lt;string&gt;();
+
+            #region a-c
+              _list.Add(&quot;abbr=abbreviation&quot;);
+              _list.Add(&quot;agg=aggregate&quot;);
+              _list.Add(&quot;app=application&quot;);
+              _list.Add(&quot;arg=argument&quot;);
+              _list.Add(&quot;args=arguments&quot;);
+              _list.Add(&quot;async=asynchronous&quot;);
+              _list.Add(&quot;attr=attribute&quot;);
+              _list.Add(&quot;attrib=attribute&quot;);
+              _list.Add(&quot;auth=authentication&quot;);
+              _list.Add(&quot;auto=automatic&quot;);
+              _list.Add(&quot;avg=average&quot;);
+              _list.Add(&quot;bak=backup&quot;);
+              _list.Add(&quot;bp=blueprint&quot;);
+              _list.Add(&quot;calc=calculate&quot;);
+              _list.Add(&quot;char=character&quot;);
+              _list.Add(&quot;chr=character&quot;);
+              _list.Add(&quot;clr=color&quot;);
+              _list.Add(&quot;cmd=command&quot;);
+              _list.Add(&quot;comms=communication&quot;);
+              _list.Add(&quot;config=configuration&quot;);
+              _list.Add(&quot;conn=connection&quot;);
+              _list.Add(&quot;const=constant&quot;);
+              _list.Add(&quot;cnt=count&quot;);
+              _list.Add(&quot;ctl=control&quot;);
+              _list.Add(&quot;ctrl=control&quot;);
+              _list.Add(&quot;cur=current&quot;);
+              _list.Add(&quot;cust=customer&quot;);
+            #endregion
+
+            #region d-i
+              _list.Add(&quot;db=database&quot;);
+              _list.Add(&quot;dbsetup=database setup&quot;);
+              _list.Add(&quot;dbl=double&quot;);
+              _list.Add(&quot;dbg=debug&quot;);
+              _list.Add(&quot;dec=decimal&quot;);
+              _list.Add(&quot;def=definition&quot;);
+              _list.Add(&quot;del=delete&quot;);
+              _list.Add(&quot;delim=delimiter&quot;);
+              _list.Add(&quot;descr=description&quot;);
+              _list.Add(&quot;dict=dictionary&quot;);
+              _list.Add(&quot;diff=difference&quot;);
+              _list.Add(&quot;dlg=dialog&quot;);
+              _list.Add(&quot;doc=document&quot;);
+              _list.Add(&quot;dte=Development Tools Environment&quot;);
+              _list.Add(&quot;enum=enumeral&quot;);
+              _list.Add(&quot;err=error&quot;);
+              _list.Add(&quot;esc=escape&quot;);
+              _list.Add(&quot;exe=executable&quot;);
+              _list.Add(&quot;exec=execute&quot;);
+              _list.Add(&quot;fld=field&quot;);
+              _list.Add(&quot;fk=foreign key&quot;);
+              _list.Add(&quot;pk=primary key&quot;);
+              _list.Add(&quot;ak=alternate key&quot;);
+              _list.Add(&quot;fn=function&quot;);
+              _list.Add(&quot;func=function&quot;);
+              _list.Add(&quot;fwd=forward&quot;);
+              _list.Add(&quot;guid=global unique identifier&quot;);
+              _list.Add(&quot;hex=hexadecimal&quot;);
+              _list.Add(&quot;ico=icon&quot;);
+              _list.Add(&quot;id=identifier&quot;);
+              _list.Add(&quot;idx=index&quot;);
+              _list.Add(&quot;impl=implementation&quot;);
+              _list.Add(&quot;info=information&quot;);
+              _list.Add(&quot;init=initialize&quot;);
+              _list.Add(&quot;ipc=inter process communication&quot;);
+            #endregion
+
+            #region l-r
+              _list.Add(&quot;lang=language&quot;);
+              _list.Add(&quot;lbl=label&quot;);
+              _list.Add(&quot;len=length&quot;);
+              _list.Add(&quot;lib=library&quot;);
+              _list.Add(&quot;lvl=level&quot;);
+              _list.Add(&quot;max=maximum&quot;);
+              _list.Add(&quot;mem=memory&quot;);
+              _list.Add(&quot;min=minimum&quot;);
+              _list.Add(&quot;MTI=method transformation information&quot;);
+              _list.Add(&quot;nl=new line&quot;);
+              _list.Add(&quot;nu=number&quot;);
+              _list.Add(&quot;num=number&quot;);
+              _list.Add(&quot;obj=object&quot;);
+              _list.Add(&quot;orig=original&quot;);
+              _list.Add(&quot;param=parameter&quot;);
+              _list.Add(&quot;params=parameters&quot;);
+              _list.Add(&quot;phys=physical&quot;);
+              _list.Add(&quot;pos=position&quot;);
+              _list.Add(&quot;pref=preference&quot;);
+              _list.Add(&quot;prev=previous&quot;);
+              _list.Add(&quot;prod=product&quot;);
+              _list.Add(&quot;prop=property&quot;);
+              _list.Add(&quot;prj=project&quot;);
+              _list.Add(&quot;pwd=password&quot;);
+              _list.Add(&quot;q=single quote&quot;);
+              _list.Add(&quot;qq=double quote&quot;);
+              _list.Add(&quot;rec=record&quot;);
+              _list.Add(&quot;ref=reference&quot;);
+              _list.Add(&quot;rel=relative&quot;);
+              _list.Add(&quot;res=resource&quot;);
+              _list.Add(&quot;rnd=random&quot;);
+            #endregion
+
+            #region s-z
+              _list.Add(&quot;src=source&quot;);
+              _list.Add(&quot;std=standard&quot;);
+              _list.Add(&quot;stmt=statement&quot;);
+              _list.Add(&quot;str=string&quot;);
+              _list.Add(&quot;struct=structure&quot;);
+              _list.Add(&quot;substr=sub-string&quot;);
+              _list.Add(&quot;sync=synchronize&quot;);
+              _list.Add(&quot;sys=system&quot;);
+              _list.Add(&quot;tbl=table&quot;);
+              _list.Add(&quot;temp=temporary&quot;);
+              _list.Add(&quot;tmp=temporary&quot;);
+              _list.Add(&quot;txt=text&quot;);
+              _list.Add(&quot;util=utility&quot;);
+              _list.Add(&quot;uri=uniform resource identifier&quot;);
+              _list.Add(&quot;val=value&quot;);
+              _list.Add(&quot;var=variable&quot;);
+              _list.Add(&quot;xelement=xml element&quot;);
+            #endregion
+
+            _list.Sort();
+            return _list;
+        }
+    }
+}
+            
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[9,9,9,10,1],[10,12,10,30,1],[10,31,10,44,1],[11,12,11,39,1],[14,15,14,46,1],[15,15,15,42,1],[16,15,16,44,1],[17,15,17,41,1],[18,15,18,43,1],[19,15,19,47,1],[20,15,20,43,1],[21,15,21,45,1],[22,15,22,48,1],[23,15,23,43,1],[24,15,24,40,1],[25,15,25,39,1],[26,15,26,41,1],[27,15,27,43,1],[28,15,28,43,1],[29,15,29,42,1],[30,15,30,38,1],[31,15,31,40,1],[32,15,32,48,1],[33,15,33,49,1],[34,15,34,44,1],[35,15,35,43,1],[36,15,36,38,1],[37,15,37,40,1],[38,15,38,41,1],[39,15,39,40,1],[40,15,40,42,1],[44,15,44,40,1],[45,15,45,51,1],[46,15,46,39,1],[47,15,47,38,1],[48,15,48,40,1],[49,15,49,43,1],[50,15,50,39,1],[51,15,51,44,1],[52,15,52,46,1],[53,15,53,44,1],[54,15,54,44,1],[55,15,55,39,1],[56,15,56,41,1],[57,15,57,62,1],[58,15,58,42,1],[59,15,59,38,1],[60,15,60,39,1],[61,15,61,43,1],[62,15,62,41,1],[63,15,63,38,1],[64,15,64,43,1],[65,15,65,43,1],[66,15,66,45,1],[67,15,67,40,1],[68,15,68,42,1],[69,15,69,40,1],[70,15,70,58,1],[71,15,71,44,1],[72,15,72,37,1],[73,15,73,42,1],[74,15,74,38,1],[75,15,75,48,1],[76,15,76,45,1],[77,15,77,44,1],[78,15,78,60,1],[82,15,82,42,1],[83,15,83,38,1],[84,15,84,39,1],[85,15,85,40,1],[86,15,86,38,1],[87,15,87,40,1],[88,15,88,39,1],[89,15,89,40,1],[90,15,90,66,1],[91,15,91,40,1],[92,15,92,38,1],[93,15,93,39,1],[94,15,94,39,1],[95,15,95,42,1],[96,15,96,44,1],[97,15,97,46,1],[98,15,98,42,1],[99,15,99,41,1],[100,15,100,44,1],[101,15,101,42,1],[102,15,102,41,1],[103,15,103,42,1],[104,15,104,40,1],[105,15,105,41,1],[106,15,106,43,1],[107,15,107,44,1],[108,15,108,39,1],[109,15,109,42,1],[110,15,110,41,1],[111,15,111,41,1],[112,15,112,39,1],[116,15,116,39,1],[117,15,117,41,1],[118,15,118,43,1],[119,15,119,39,1],[120,15,120,45,1],[121,15,121,46,1],[122,15,122,45,1],[123,15,123,39,1],[124,15,124,38,1],[125,15,125,43,1],[126,15,126,42,1],[127,15,127,37,1],[128,15,128,41,1],[129,15,129,60,1],[130,15,130,38,1],[131,15,131,41,1],[132,15,132,49,1],[135,13,135,26,1],[136,13,136,26,1],[137,9,137,10,1]]);
+    </script>
+  </body>
+</html>

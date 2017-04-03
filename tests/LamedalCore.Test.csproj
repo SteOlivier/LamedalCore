@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{66311AA8-6427-4B6A-840A-0E8C6D0A2B05}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LamedalCore.Test</RootNamespace>
+    <AssemblyName>LamedalCore.Test</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="LamedalCore, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\LamedalCore\bin\Debug\net461\LamedalCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.abstractions.2.0.1\lib\net35\xunit.abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.assert, Version=2.2.0.3402, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.assert.2.2.0-beta3-build3402\lib\netstandard1.0\xunit.assert.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.core, Version=2.2.0.3402, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.extensibility.core.2.2.0-beta3-build3402\lib\net45\xunit.core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.execution.desktop, Version=2.2.0.3402, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\xunit.extensibility.execution.2.2.0-beta3-build3402\lib\net45\xunit.execution.desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Tests\Config_Info.cs" />
+    <Compile Include="Tests\domain\domain_AttributesBlueprint_Test.cs" />
+    <Compile Include="Tests\lib\IO\IO_.cs" />
+    <Compile Include="Tests\lib\IO\IO_File_Test.cs" />
+    <Compile Include="Tests\lib\IO\IO_Parts_Test.cs" />
+    <Compile Include="Tests\lib\IO\IO_StateInfo_Data.cs" />
+    <Compile Include="Tests\lib\ClassNT\ClassNTAttributeBlueprint_Test\ClassNTAttributeBlueprint_Test1.cs" />
+    <Compile Include="Tests\lib\ClassNT\ClassNTAttributeBlueprint_Test\ClassNTAttributeBlueprint_Test2.cs" />
+    <Compile Include="Tests\lib\ClassNT\ClassNTAttributeBlueprint_Test\ClassNTAttributeBlueprint_Test3.cs" />
+    <Compile Include="Tests\lib\ClassNT\ClassNTAttributeBlueprint_Test\ClassNTAttributeBlueprint_Test4.cs" />
+    <Compile Include="Tests\lib\ClassNT\ClassNTAttributeBlueprint_Test\ClassNTAttributeBlueprint_Test5.cs" />
+    <Compile Include="Tests\lib\ClassNT\ClassNTAttribute_Test.cs" />
+    <Compile Include="Tests\lib\ClassNT\ClassNTHeader_Test.cs" />
+    <Compile Include="Tests\lib\ClassNT\ClassNTMethodStats_Test.cs" />
+    <Compile Include="Tests\lib\ClassNT\ClassNTMethod_Test.cs" />
+    <Compile Include="Tests\lib\ClassNT\ClassNTProperty_Test.cs" />
+    <Compile Include="Tests\lib\ClassNT\ClassNT_Test.cs" />
+    <Compile Include="Tests\lib\lib_Command_Test.cs" />
+    <Compile Include="Tests\lib\lib_Console_IO_Test.cs" />
+    <Compile Include="Tests\lib\XML\pcMindMap.cs" />
+    <Compile Include="Tests\lib\XML\XML_MindmapList_Test.cs" />
+    <Compile Include="Tests\lib\XML\XML_Mindmap_Test.cs" />
+    <Compile Include="Tests\lib\XML\XML_xDoc_Test.cs" />
+    <Compile Include="Tests\Types\Class\Class_Attributes_Data.cs" />
+    <Compile Include="Tests\Types\Types_DateTimeSpan_Test.cs" />
+    <Compile Include="Tests\zPublicClass\GridBlock_zzTest.cs" />
+    <Compile Include="Tests\_Data\TestData_.cs" />
+    <Compile Include="Tests\Types\Types_Enum_Data.cs" />
+    <Compile Include="Tests\Types\List\List_Convert_Data.cs" />
+    <Compile Include="Tests\Types\List\List_Action_Test.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\_Data\TestData_Json.cs" />
+    <Compile Include="Tests\Types\Class\Class_Info_Data.cs" />
+    <Compile Include="Tests\_Data\Types_Is_Test_StructSimple.cs" />
+    <Compile Include="Tests\lib\IO\IO_StateInfo_Test.cs" />
+    <Compile Include="Tests\lib\IO\IO_Folder_Test.cs" />
+    <Compile Include="Tests\lib\lib_Words_Test.cs" />
+    <Compile Include="Tests\Types\Class\Class_Attributes_Test.cs" />
+    <Compile Include="Tests\Types\Class\Class_StateInfo_Data.cs" />
+    <Compile Include="Tests\Types\List\List_QueueAndStack_Test.cs" />
+    <Compile Include="Tests\Types\List\List_String_Test.cs" />
+    <Compile Include="Tests\Types\String\String_Edit_Test.cs" />
+    <Compile Include="Tests\Types\String\String_Search_Test.cs" />
+    <Compile Include="Tests\Types\String\String_Setup_Test.cs" />
+    <Compile Include="Tests\Types\String\String_SpecialChar_Test.cs" />
+    <Compile Include="Tests\Types\String\String_Word_Test.cs" />
+    <Compile Include="Tests\Types\String\String_Regex_Test.cs" />
+    <Compile Include="Tests\zPublicClass\MsExcel\MsExcel_Create_Test.cs" />
+    <Compile Include="Tests\zPublicClass\MsExcel\MsExcel_Dashboard_Test.cs" />
+    <Compile Include="Tests\zPublicClass\MsExcel\MsExcel_ExcelFiles_TestCases.cs" />
+    <Compile Include="Tests\zPublicClass\MsExcel\MsExcel_Sheet_Test.cs" />
+    <Compile Include="Tests\zPublicClass\MsExcel\MsExcel_Macro_Test.cs" />
+    <Compile Include="Tests\domain\domain_Exceptions_Test.cs" />
+    <Compile Include="Tests\lib\IO\IO_Json_Test.cs" />
+    <Compile Include="Tests\zPublicClass\MsExcel\MsExcel_Test.cs" />
+    <Compile Include="Tests\Config_Test.cs" />
+    <Compile Include="Tests\lib\XML\XML_Setup_Test.cs" />
+    <Compile Include="Tests\Types\Class\Class_StateInfo_Test.cs" />
+    <Compile Include="Tests\Types\Class\Class_Info_Test.cs" />
+    <Compile Include="Tests\Types\List\List_Enum_Test.cs" />
+    <Compile Include="Tests\Types\Types_DateTime_Test.cs" />
+    <Compile Include="Tests\Types\Types_Dictionary_Test.cs" />
+    <Compile Include="Tests\Types\Types_Enum_Test.cs" />
+    <Compile Include="Tests\Types\List\List_Convert_Test.cs" />
+    <Compile Include="Tests\Types\List\List_Find_Test.cs" />
+    <Compile Include="Tests\Types\List\List_Level_Test.cs" />
+    <Compile Include="Tests\Types\Types_int_Test.cs" />
+    <Compile Include="Tests\Types\Types_Object_Test.cs" />
+    <Compile Include="Tests\Types\Types_Test.cs" />
+    <Compile Include="Tests\Types\Types_Convert_Test.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestData\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

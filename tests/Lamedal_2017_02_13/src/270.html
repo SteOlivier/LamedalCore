@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\types\list\list_stack.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.zz;
+
+namespace LamedalCore.Types.List
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action)]
+    public sealed class List_Stack
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance; // system library
+
+        /// &lt;summary&gt;
+        /// Treats list like a stack, pushing &lt;paramref name=&quot;value&quot;/&gt;
+        /// on to the list; in other words adding it to the end of 
+        /// the list.
+        /// &lt;/summary&gt;
+        [DebuggerStepThrough]
+        public void Push&lt;T&gt;(IList&lt;T&gt; list, T value)
+        {
+            if (list == null) throw new ArgumentNullException(nameof(list));
+            list.Add(value);
+        }
+
+        /// &lt;summary&gt;
+        /// Treats list like a stack, popping (removing and returning)
+        /// the last value on the list.
+        /// &lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;list&quot;&gt;The list.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        /// &lt;exception cref=&quot;System.ArgumentNullException&quot;&gt;&lt;/exception&gt;
+        [DebuggerStepThrough]
+        public T Pop&lt;T&gt;(IList&lt;T&gt; list)
+        {
+            if (list == null) throw new ArgumentNullException(nameof(list));
+            if (list.Count == 0) return _lamed.Types.Object.DefaultValue&lt;T&gt;();
+
+            var value = list.Last();
+            list.RemoveAt(list.Count -1);
+            return value;
+        }
+
+
+        /// &lt;summary&gt;Treats list like a stack, peeking and return the last value on the list.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;list&quot;&gt;The list.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        /// &lt;exception cref=&quot;System.ArgumentNullException&quot;&gt;list&lt;/exception&gt;
+        [DebuggerStepThrough]
+        public T Peek&lt;T&gt;(IList&lt;T&gt; list)
+        {
+            if (list == null) throw new ArgumentNullException(nameof(list));
+            if (list.Count == 0) return _lamed.Types.Object.DefaultValue&lt;T&gt;();
+
+            return list.Last();
+        }
+
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[23,9,23,10,1],[24,13,24,30,1],[24,31,24,77,1],[25,13,25,29,1],[26,9,26,10,1],[38,9,38,10,1],[39,13,39,30,1],[39,31,39,77,1],[40,13,40,33,1],[40,34,40,79,1],[42,13,42,37,1],[43,13,43,42,1],[44,13,44,26,1],[45,9,45,10,1],[55,9,55,10,1],[56,13,56,30,1],[56,31,56,77,1],[57,13,57,33,1],[57,34,57,79,1],[59,13,59,32,1],[60,9,60,10,1],[14,9,14,70,1]]);
+    </script>
+  </body>
+</html>

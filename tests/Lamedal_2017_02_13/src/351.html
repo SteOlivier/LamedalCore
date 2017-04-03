@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\excel\excel_macroitem.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using LamedalCore.zPublicClass.ExcelData;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.Excel
+{
+    public sealed class Excel_MacroItem
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance;
+
+        /// &lt;summary&gt;Parse the row item and return true and ref values if the row item need to be calculated&lt;/summary&gt;
+        /// &lt;param name=&quot;row&quot;&gt;The row.&lt;/param&gt;
+        /// &lt;param name=&quot;index&quot;&gt;The index.&lt;/param&gt;
+        /// &lt;param name=&quot;value1&quot;&gt;The value1.&lt;/param&gt;
+        /// &lt;param name=&quot;value2&quot;&gt;The value2.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool ItemRow_LessThan(List&lt;string&gt; row, int index, out string value1, out string value2)
+        {
+            // |&lt;|
+            if (row[index].Trim() == &quot;|&lt;|&quot; &amp;&amp; index &lt; row.Count - 2)
+            {
+                // Get the previouse two values
+                value1 = row[index + 2];
+                value2 = row[index + 1];
+                return true;
+            }
+
+            value1 = value2 = &quot;&quot;;
+            return false;
+        }
+
+        /// &lt;summary&gt;Parse the row item and return true and ref values if the row item need to be calculated&lt;/summary&gt;
+        /// &lt;param name=&quot;row&quot;&gt;The row.&lt;/param&gt;
+        /// &lt;param name=&quot;index&quot;&gt;The index.&lt;/param&gt;
+        /// &lt;param name=&quot;value1&quot;&gt;The value1.&lt;/param&gt;
+        /// &lt;param name=&quot;value2&quot;&gt;The value2.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool ItemRow_GreaterThan(List&lt;string&gt; row, int index, out string value1, out string value2)
+        {
+            // |&gt;|
+            if (row[index].Trim() == &quot;|&gt;|&quot; &amp;&amp; index &gt; 1)
+            {
+                // Get the previouse two values
+                value1 = row[index - 2];
+                value2 = row[index - 1];
+                return true;
+            }
+
+            value1 = value2 = &quot;&quot;;
+            return false;
+        }
+
+        /// &lt;summary&gt;Parse the row item and return true and ref values if the row item need to be calculated&lt;/summary&gt;
+        /// &lt;param name=&quot;col&quot;&gt;The row.&lt;/param&gt;
+        /// &lt;param name=&quot;index&quot;&gt;The index.&lt;/param&gt;
+        /// &lt;param name=&quot;value1&quot;&gt;The value1.&lt;/param&gt;
+        /// &lt;param name=&quot;value2&quot;&gt;The value2.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool ItemCol_Down(List&lt;string&gt; col, int index, out string value1, out string value2)
+        {
+            // |V|
+            if (col[index].Trim() == &quot;|V|&quot; &amp;&amp; index &gt; 1)
+            {
+                // Get the previouse two values
+                value1 = col[index - 2];
+                value2 = col[index - 1];
+                return true;
+            }
+
+            value1 = value2 = &quot;&quot;;
+            return false;
+        }
+
+        /// &lt;summary&gt;Parse the row item and return true and ref values if the row item need to be calculated&lt;/summary&gt;
+        /// &lt;param name=&quot;col&quot;&gt;The row.&lt;/param&gt;
+        /// &lt;param name=&quot;index&quot;&gt;The index.&lt;/param&gt;
+        /// &lt;param name=&quot;value1&quot;&gt;The value1.&lt;/param&gt;
+        /// &lt;param name=&quot;value2&quot;&gt;The value2.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool ItemCol_Up(List&lt;string&gt; col, int index, out string value1, out string value2)
+        {
+            // |^|
+            if (col[index].Trim() == &quot;|^|&quot; &amp;&amp; index &lt; col.Count - 2)
+            {
+                // Get the previouse two values
+                value1 = col[index + 2];
+                value2 = col[index + 1];
+                return true;
+            }
+
+            value1 = value2 = &quot;&quot;;
+            return false;
+        }
+
+        /// &lt;summary&gt;Compiles the row.&lt;/summary&gt;
+        /// &lt;param name=&quot;column&quot;&gt;The row.&lt;/param&gt;
+        /// &lt;param name=&quot;errorMsg&quot;&gt;The error MSG.&lt;/param&gt;
+        /// &lt;returns&gt;If values were updated return true&lt;/returns&gt;
+        public bool Compile_Column(List&lt;string&gt; column, out string errorMsg)
+        {
+            var result = false;
+            errorMsg = &quot;&quot;;
+            string value1, value2;
+            // Get the first &quot;|&gt;|&quot; and execute the macro
+            for (int ii = 0; ii &lt; column.Count; ii++)
+            {
+                if (ItemCol_Down(column, ii, out value1, out value2))
+                {
+                    string errMsg1;
+                    column[ii] = Compile_NextValue(value1, value2, out errMsg1);  // Get the previouse two values
+                    if (errMsg1 != &quot;&quot;) errorMsg += errMsg1;
+                    result = true;
+                }
+            }
+
+            // Get the first &quot;|&lt;|&quot; and execute the macro
+            for (int ii = column.Count - 1; ii &gt;= 0; ii--)
+            {
+                if (ItemCol_Up(column, ii, out value1, out value2))
+                {
+                    string errMsg1;
+                    column[ii] = Compile_NextValue(value1, value2, out errMsg1);  // Get the previouse two values
+                    if (errMsg1 != &quot;&quot;) errorMsg += errMsg1;
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        /// &lt;summary&gt;Compiles the row.&lt;/summary&gt;
+        /// &lt;param name=&quot;row&quot;&gt;The row.&lt;/param&gt;
+        /// &lt;param name=&quot;errorMsg&quot;&gt;The error MSG.&lt;/param&gt;
+        /// &lt;exception cref=&quot;System.Exception&quot;&gt;&lt;/exception&gt;
+        public bool Compile_Row(List&lt;string&gt; row, out string errorMsg)
+        {
+            errorMsg = &quot;&quot;;
+            string value1, value2;
+            // Get the first &quot;|&gt;|&quot; and execute the macro
+            for (int ii = 0; ii &lt; row.Count; ii++)
+            {
+                try
+                {
+                    if (ItemRow_GreaterThan(row, ii, out value1, out value2))
+                    {
+                        string errMsg1;
+                        row[ii] = Compile_NextValue(value1, value2, out errMsg1);  // Get the previouse two values
+                        if (errMsg1 != &quot;&quot;) errorMsg += errMsg1;
+                    }
+                }
+                catch (Exception ex)  // Unit test required for this exception
+                {
+                    ex.zException_Show(&quot;Error in row: &quot; + row.zTo_Str(&quot;,&quot;));
+                }
+            }
+
+            // Get the first &quot;|&lt;|&quot; and execute the macro
+            for (int ii = row.Count - 1; ii &gt;= 0; ii--)
+            {
+                if (ItemRow_LessThan(row, ii, out value1, out value2))
+                {
+                    string errMsg1;
+                    row[ii] = Compile_NextValue(value1, value2, out errMsg1);  // Get the previouse two values
+                    if (errMsg1 != &quot;&quot;) errorMsg += errMsg1;
+                }
+            }
+
+            if (errorMsg == &quot;&quot;) return true;
+            return false;
+        }
+
+        /// &lt;summary&gt;Compiles the next cell value.&lt;/summary&gt;
+        /// &lt;param name=&quot;value1&quot;&gt;The value1.&lt;/param&gt;
+        /// &lt;param name=&quot;value2&quot;&gt;The value2.&lt;/param&gt;
+        /// &lt;param name=&quot;errMsg&quot;&gt;The error MSG.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Compile_NextValue(string value1, string value2, out string errMsg)
+        {
+            errMsg = &quot;&quot;;
+            // Check the format of value1, value2
+            value1 = value1.Trim();
+            value2 = value2.Trim();
+
+            if (_lamed.Types.Test.IsNumeric(value1))
+            {
+                // Number
+                int val1 = value1.zTo_Int();
+                int val2 = value2.zTo_Int();
+                var result = val2 + (val2 - val1);
+                return result.zTo_Str();
+            }
+            else
+            {
+                #region Address
+                // Test if Value1, Value2 is valid addresses
+                string errMsg1, errMsg2;
+                var address1 = _IsValidMacroValue(ref value1, out errMsg1);
+                var address2 = _IsValidMacroValue(ref value2, out errMsg2);
+                errMsg = errMsg1.NL() + errMsg2;
+
+                if (address1 &amp;&amp; address2)
+                {
+                    int col1, row1, col2, row2;
+                    _lamed.lib.Excel.Adress.ColRow_AsInt(out col1, out row1, value1);
+                    _lamed.lib.Excel.Adress.ColRow_AsInt(out col2, out row2, value2);
+                    int resultCol = col2 + (col2 - col1);
+                    int resultRow = row2 + (row2 - row1);
+                    var result = _lamed.lib.Excel.Adress.CellAddress(resultCol, resultRow, false);
+                    return &quot;|&quot; + result + &quot;|&quot;;
+                }
+                else return &quot;|??|&quot;;
+                #endregion
+            }
+        }
+
+        /// &lt;summary&gt;Test if the Cell value is a valid macro.&lt;/summary&gt;
+        /// &lt;param name=&quot;value&quot;&gt;The value.&lt;/param&gt;
+        /// &lt;param name=&quot;errorMsg&quot;&gt;The error MSG.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool _IsValidMacroValue(ref string value, out string errorMsg)
+        {
+            errorMsg = &quot;&quot;;
+            if (value.Length &lt; 2) errorMsg = $&quot;Error! &#39;{value}&#39; is not a macro setting.&quot;;
+            if (&quot;|&quot; != value.Substring(0, 1)) errorMsg = $&quot;Error! &#39;{value}&#39; is not a macro setting.&quot;;
+            if (&quot;|&quot; != value.Substring(value.Length - 1, 1)) errorMsg = $&quot;Error! &#39;{value}&#39; is not a macro setting.&quot;;
+            if (errorMsg != &quot;&quot;) return false;  // &lt;-----------------------------------------------------------------
+
+            value = value.Replace(&quot;|&quot;, &quot;&quot;);
+            if (value == &quot;??&quot;)
+            {
+                errorMsg = &quot;Error! ?? is undefined.&quot;;
+                return false; // &lt;----------------------------------------------------------------------------
+            }
+
+            return true;
+        }
+
+        /// &lt;summary&gt;From the cell list calculate a new value from the top and left cell name&lt;/summary&gt;
+        /// &lt;param name=&quot;data&quot;&gt;The data.&lt;/param&gt;
+        /// &lt;param name=&quot;addressList&quot;&gt;The address list.&lt;/param&gt;
+        public void Compile_DownLeftCalculate(pcExcelData_ data, List&lt;string&gt; addressList)
+        {
+            // &#39;|V&gt;|&#39;
+            foreach (string cell in addressList)
+            {
+                int col, row;
+                _lamed.lib.Excel.Adress.ColRow_AsInt(out col, out row, cell);
+                var value1 = data.Value_Get(col, row - 1);
+                var value2 = data.Value_Get(col - 1, row);
+                var value = Compile_CellMergeValues(value1, value2);
+                data.Value_Set(cell, value);
+            }
+        }
+
+        /// &lt;summary&gt;Compile the |V0| macro code&lt;/summary&gt;
+        /// &lt;param name=&quot;data&quot;&gt;The data.&lt;/param&gt;
+        /// &lt;param name=&quot;addressList&quot;&gt;The address list.&lt;/param&gt;
+        public void Compile_Down0Calculate(pcExcelData_ data, List&lt;string&gt; addressList)
+        {
+            foreach (string cell in addressList)
+            {
+                int col, row;
+                _lamed.lib.Excel.Adress.ColRow_AsInt(out col, out row, cell);
+                var value1 = data.Value_Get(col, row - 1);
+                data.Value_Set(cell, value1);
+            }
+        }
+
+        /// &lt;summary&gt;Compile the |^0| macro code&lt;/summary&gt;
+        /// &lt;param name=&quot;data&quot;&gt;The data.&lt;/param&gt;
+        /// &lt;param name=&quot;addressList&quot;&gt;The address list.&lt;/param&gt;
+        public void Compile_Up0Calculate(pcExcelData_ data, List&lt;string&gt; addressList)
+        {
+            addressList.Reverse();
+            foreach (string cell in addressList)
+            {
+                int col, row;
+                _lamed.lib.Excel.Adress.ColRow_AsInt(out col, out row, cell);
+                var value1 = data.Value_Get(col, row + 1);
+                data.Value_Set(cell, value1);
+            }
+        }
+
+        /// &lt;summary&gt;Compiles the next cell value.&lt;/summary&gt;
+        /// &lt;param name=&quot;value1&quot;&gt;The value1.&lt;/param&gt;
+        /// &lt;param name=&quot;value2&quot;&gt;The value2.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Compile_CellMergeValues(string value1, string value2)
+        {
+            bool value1Macro = false;
+            bool value2Macro = false;
+
+            // Check the format of value1, value2
+            value1 = value1.Trim();
+            value2 = value2.Trim();
+            string errorMsg1, errorMsg2;
+            //if (value1.Contains(&quot;|&quot;)) value1Macro = true;
+            // if (value2.Contains(&quot;|&quot;)) value2Macro = true;
+            if (_IsValidMacroValue(ref value1, out errorMsg1)) value1Macro = true;
+            if (_IsValidMacroValue(ref value2, out errorMsg2)) value2Macro = true;
+            if (value1Macro != value2Macro) throw new ArgumentException($&quot;Error! Inconsistent parameters &#39;{value1}&#39; and &#39;{value2}&#39;.&quot;.NL() + errorMsg1.NL() + errorMsg2);
+
+            // value1 = value1.Replace(&quot;|&quot;, &quot;&quot;);
+            //value2 = value2.Replace(&quot;|&quot;, &quot;&quot;);
+
+            int col1, row1, col2, row2;
+            _lamed.lib.Excel.Adress.ColRow_AsInt(out col1, out row1, value1);
+            _lamed.lib.Excel.Adress.ColRow_AsInt(out col2, out row2, value2);
+            var resultCol = col1;
+            var resultRow = row2;
+            var result = _lamed.lib.Excel.Adress.CellAddress(resultCol, resultRow);
+            if (value1Macro) result = &quot;|&quot; + result + &quot;|&quot;;
+            return result;
+
+        }
+
+
+        /// &lt;summary&gt;Checks the data integrity of the sheet.&lt;/summary&gt;
+        /// &lt;param name=&quot;data&quot;&gt;The data.&lt;/param&gt;
+        /// &lt;param name=&quot;cellAddress&quot;&gt;The cell address.&lt;/param&gt;
+        /// &lt;param name=&quot;cellValue&quot;&gt;The cell value.&lt;/param&gt;
+        /// &lt;param name=&quot;resultMsg&quot;&gt;The error MSG.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool DataIntegrity_Check(pcExcelData_ data, string cellAddress, string cellValue, out string resultMsg)
+        {
+            var testValue = data.Value_Get(cellAddress);
+            if (cellValue != testValue)
+            {
+                resultMsg = $&quot;Reference check address: &#39;{cellAddress}&#39; == &#39;{testValue}&#39;  (Error! Should be &#39;{cellValue}&#39;).&quot;;
+                return false;
+            }
+            resultMsg = $&quot;Reference check address: &#39;{cellAddress}&#39; == &#39;{testValue}&#39; (Ok).&quot;;
+            return true;
+        }
+
+        /// &lt;summary&gt;Return the References the cell address and cell value.&lt;/summary&gt;
+        /// &lt;param name=&quot;item&quot;&gt;The item.&lt;/param&gt;
+        /// &lt;param name=&quot;cellAddress&quot;&gt;The cell address.&lt;/param&gt;
+        /// &lt;param name=&quot;cellValue&quot;&gt;The cell value.&lt;/param&gt;
+        public void DataIntegrity_CellParser(string item, out string cellAddress, out string cellValue)
+        {
+            cellAddress = item.zvar_Id(&quot;-&gt;&quot;);
+            cellAddress = cellAddress.Replace(&quot;|&quot;, &quot;&quot;);
+            cellValue = item.zvar_Value(&quot;-&gt;&quot;);
+            cellValue = cellValue.Replace(&quot;\&quot;&quot;, &quot;&quot;).Trim();
+        }
+
+        /// &lt;summary&gt;Parses the sheet definition values into a class.&lt;/summary&gt;
+        /// &lt;param name=&quot;parseValue&quot;&gt;The value that must be parsed.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public pcExcelDef_Sheet SheetDef_Parse(string parseValue)
+        {
+            // {Sheet}-&gt;&quot;Q22&quot;;{Data}-&gt;|A5|;|A10|-&gt;&quot;Name or Nickname:&quot;;|A14|-&gt;&quot;1&quot;;|A35|-&gt;&quot;22&quot;;|K12|-&gt;&quot;Total&quot;
+            // ============================================================================================
+
+            if (parseValue.Contains(&quot;{Sheet}-&gt;&quot;) == false) &quot;Error! &#39;{Sheet}-&gt;&#39; was not found.&quot;.zException_Show();
+            if (parseValue.Contains(&quot;;{Data}-&gt;&quot;) == false) &quot;Error! &#39;;{Data}-&gt;&#39; was not found.&quot;.zException_Show();
+            if (parseValue.Contains(&quot;|-&gt;&quot;) == false) &quot;Error! &#39;|-&gt;&#39; cell reference was not found.&quot;.zException_Show();
+
+            var valueList = parseValue.zConvert_Str_ToListStr(&quot;;|&quot;);
+            if (valueList.Count &lt; 3) &quot;Error! No cell references checks defined.&quot;.zException_Show();
+
+            var result = new pcExcelDef_Sheet();
+            // SheetName ]=================================
+            var dataCellAddress = valueList[0];
+            &quot;}-&gt;&quot;.zVar_Next(ref dataCellAddress, true);
+            var sheetName = &quot;;{Data}-&gt;&quot;.zVar_Next(ref dataCellAddress, true);
+            if (sheetName.Contains(&quot;\&quot;&quot;) == false) $&quot;Error! Sheet ref &#39;{sheetName}&#39; does not contain quotes.&quot;.zException_Show();  // This is extra safety test
+            result.SheetName = sheetName.Replace(&quot;\&quot;&quot;, &quot;&quot;);
+
+            // DataCellAddress ]===========================
+            result.DataCellAddress = dataCellAddress.Replace(&quot;|&quot;, &quot;&quot;);
+
+            for (int ii = 1; ii &lt; valueList.Count; ii++)
+            {
+                var val = valueList[ii];
+                var address = val.zvar_Id(&quot;|-&gt;&quot;);
+                var value = val.zvar_Value(&quot;|-&gt;&quot;);
+                if (value.Contains(&quot;\&quot;&quot;) == false) $&quot;Error! Cell value &#39;{val}&#39; does not contain quotes.&quot;.zException_Show();
+                var cell = new pcExcelDef_Cell
+                {
+                    CellAddress = address,
+                    CellValue = value.Replace(&quot;\&quot;&quot;, &quot;&quot;)
+                };
+                result.Cells.Add(cell);
+            }
+            return result;
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[153,17,153,37,0],[154,17,154,18,0],[155,21,155,77,0],[156,17,156,18,0],[381,52,381,124,0],[21,9,21,10,1],[23,13,23,69,1],[24,13,24,14,1],[26,17,26,41,1],[27,17,27,41,1],[28,17,28,29,1],[31,13,31,34,1],[32,13,32,26,1],[33,9,33,10,1],[42,9,42,10,1],[44,13,44,57,1],[45,13,45,14,1],[47,17,47,41,1],[48,17,48,41,1],[49,17,49,29,1],[52,13,52,34,1],[53,13,53,26,1],[54,9,54,10,1],[63,9,63,10,1],[65,13,65,57,1],[66,13,66,14,1],[68,17,68,41,1],[69,17,69,41,1],[70,17,70,29,1],[73,13,73,34,1],[74,13,74,26,1],[75,9,75,10,1],[84,9,84,10,1],[86,13,86,69,1],[87,13,87,14,1],[89,17,89,41,1],[90,17,90,41,1],[91,17,91,29,1],[94,13,94,34,1],[95,13,95,26,1],[96,9,96,10,1],[103,9,103,10,1],[104,13,104,32,1],[105,13,105,27,1],[108,18,108,28,1],[109,13,109,14,1],[110,17,110,70,1],[111,17,111,18,1],[113,21,113,81,1],[114,21,114,39,1],[114,40,114,60,1],[115,21,115,35,1],[116,17,116,18,1],[117,13,117,14,1],[108,49,108,53,1],[108,30,108,47,1],[120,18,120,43,1],[121,13,121,14,1],[122,17,122,68,1],[123,17,123,18,1],[125,21,125,81,1],[126,21,126,39,1],[126,40,126,60,1],[127,21,127,35,1],[128,17,128,18,1],[129,13,129,14,1],[120,54,120,58,1],[120,45,120,52,1],[130,13,130,27,1],[131,9,131,10,1],[138,9,138,10,1],[139,13,139,27,1],[142,18,142,28,1],[143,13,143,14,1],[145,17,145,18,1],[146,21,146,78,1],[147,21,147,22,1],[149,25,149,82,1],[150,25,150,43,1],[150,44,150,64,1],[151,21,151,22,1],[152,17,152,18,1],[157,13,157,14,1],[142,46,142,50,1],[142,30,142,44,1],[160,18,160,40,1],[161,13,161,14,1],[162,17,162,71,1],[163,17,163,18,1],[165,21,165,78,1],[166,21,166,39,1],[166,40,166,60,1],[167,17,167,18,1],[168,13,168,14,1],[160,51,160,55,1],[160,42,160,49,1],[170,13,170,32,1],[170,33,170,45,1],[171,13,171,26,1],[172,9,172,10,1],[180,9,180,10,1],[181,13,181,25,1],[183,13,183,36,1],[184,13,184,36,1],[186,13,186,53,1],[187,13,187,14,1],[189,17,189,45,1],[190,17,190,45,1],[191,17,191,51,1],[192,17,192,41,1],[195,13,195,14,1],[199,17,199,76,1],[200,17,200,76,1],[201,17,201,49,1],[203,17,203,42,1],[204,17,204,18,1],[206,21,206,86,1],[207,21,207,86,1],[208,21,208,58,1],[209,21,209,58,1],[210,21,210,99,1],[211,21,211,47,1],[213,22,213,36,1],[216,9,216,10,1],[223,9,223,10,1],[224,13,224,27,1],[225,13,225,34,1],[225,35,225,90,1],[226,13,226,46,1],[226,47,226,102,1],[227,13,227,61,1],[227,62,227,117,1],[228,13,228,32,1],[228,33,228,46,1],[230,13,230,44,1],[231,13,231,31,1],[232,13,232,14,1],[233,17,233,54,1],[234,17,234,30,1],[237,13,237,25,1],[238,9,238,10,1],[244,9,244,10,1],[246,13,246,20,1],[246,37,246,48,1],[246,22,246,33,1],[247,13,247,14,1],[249,17,249,78,1],[250,17,250,59,1],[251,17,251,59,1],[252,17,252,69,1],[253,17,253,45,1],[254,13,254,14,1],[246,34,246,36,1],[255,9,255,10,1],[261,9,261,10,1],[262,13,262,20,1],[262,37,262,48,1],[262,22,262,33,1],[263,13,263,14,1],[265,17,265,78,1],[266,17,266,59,1],[267,17,267,46,1],[268,13,268,14,1],[262,34,262,36,1],[269,9,269,10,1],[275,9,275,10,1],[276,13,276,35,1],[277,13,277,20,1],[277,37,277,48,1],[277,22,277,33,1],[278,13,278,14,1],[280,17,280,78,1],[281,17,281,59,1],[282,17,282,46,1],[283,13,283,14,1],[277,34,277,36,1],[284,9,284,10,1],[291,9,291,10,1],[292,13,292,38,1],[293,13,293,38,1],[296,13,296,36,1],[297,13,297,36,1],[301,13,301,63,1],[301,64,301,83,1],[302,13,302,63,1],[302,64,302,83,1],[303,13,303,44,1],[303,45,303,169,1],[309,13,309,78,1],[310,13,310,78,1],[311,13,311,34,1],[312,13,312,34,1],[313,13,313,84,1],[314,13,314,29,1],[314,30,314,58,1],[315,13,315,27,1],[317,9,317,10,1],[327,9,327,10,1],[328,13,328,57,1],[329,13,329,40,1],[330,13,330,14,1],[331,17,331,125,1],[332,17,332,30,1],[334,13,334,92,1],[335,13,335,25,1],[336,9,336,10,1],[343,9,343,10,1],[344,13,344,46,1],[345,13,345,56,1],[346,13,346,47,1],[347,13,347,60,1],[348,9,348,10,1],[354,9,354,10,1],[358,13,358,59,1],[358,60,358,114,1],[359,13,359,59,1],[359,60,359,114,1],[360,13,360,53,1],[360,54,360,117,1],[362,13,362,69,1],[363,13,363,37,1],[363,38,363,100,1],[365,13,365,49,1],[367,13,367,48,1],[368,13,368,56,1],[369,13,369,78,1],[370,13,370,51,1],[370,52,370,129,1],[371,13,371,60,1],[374,13,374,71,1],[376,18,376,28,1],[377,13,377,14,1],[378,17,378,41,1],[379,17,379,50,1],[380,17,380,51,1],[381,17,381,51,1],[382,17,386,19,1],[387,17,387,40,1],[388,13,388,14,1],[376,52,376,56,1],[376,30,376,50,1],[389,13,389,27,1],[390,9,390,10,1],[12,9,12,70,1]]);
+    </script>
+  </body>
+</html>

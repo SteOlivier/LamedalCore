@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\excel\excel_io_read.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.zPublicClass.ExcelData;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.Excel
+{
+    public sealed class Excel_IO_Read
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance; // system library
+
+
+        /// &lt;summary&gt;Reads the excel file using Open XML SDK.&lt;/summary&gt;
+        /// &lt;param name=&quot;fileName&quot;&gt;Name of the file.&lt;/param&gt;
+        /// &lt;param name=&quot;sheetName&quot;&gt;&lt;/param&gt;
+        public pcExcelData_ ExcelFile_LoadAsExcelData(string fileName, string sheetName = &quot;&quot;)
+        {
+            if (fileName == &quot;&quot;) throw new ArgumentException(&quot;Error! filename must be assigned!&quot;, fileName);
+            if (_lamed.lib.IO.File.Exists(fileName) == false) throw new ArgumentException($&quot;Error! File &#39;{fileName}&#39; does not exist.&quot;);
+
+            var result = new pcExcelData_();
+            using (FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+            {
+                using (var spreadsheetDocument = SpreadsheetDocument.Open(fileStream, true))
+                {
+                    //sharedStringTable = null;
+                    WorkbookPart workbookPart = spreadsheetDocument.WorkbookPart;
+
+                    IEnumerable&lt;SharedStringTablePart&gt; sharedStringTableParts = workbookPart.GetPartsOfType&lt;SharedStringTablePart&gt;();
+                    SharedStringTablePart sharedStringTablePart;
+                    if (sharedStringTableParts.Count() &gt; 0)
+                        sharedStringTablePart = sharedStringTableParts.First();
+                    else sharedStringTablePart = spreadsheetDocument.WorkbookPart.AddNewPart&lt;SharedStringTablePart&gt;();
+                    SharedStringTable sharedStringTable = sharedStringTablePart.SharedStringTable;
+
+                    //WorksheetPart worksheetPart = workbookPart.WorksheetParts.Last();
+                    WorksheetPart worksheetPart = WorksheetPart_FromName(workbookPart, sheetName);
+                    Worksheet worksheet = worksheetPart.Worksheet;
+
+                    IEnumerable&lt;Row&gt; rows = Rows(worksheet);
+                    Debug.WriteLine(&quot;Row count = {0}&quot;.zFormat(Row_Count(worksheet)));
+                    //Cells(worksheet);
+                    //Debug.WriteLine(&quot;Cell count = {0}&quot;.zFormat(cells.LongCount()));
+                    //Debug.WriteLine(&quot;Col count = {0}&quot;.zFormat(cells.LongCount() / rows.LongCount()));
+
+                    #region One way: go through each cell in the sheet
+                    //foreach (Cell cell in cells)
+                    //{
+                    //    var ref1 = cell.CellReference;
+                    //    if ((cell.DataType != null) &amp;&amp; (cell.DataType == CellValues.SharedString))
+                    //    {
+
+                    //        int ssid = int.Parse(cell.CellValue.Text);
+                    //        string str = sharedStringTable.ChildElements[ssid].InnerText;
+                    //        Debug.WriteLine(&quot;Shared string {0}: {1}&quot;, ssid, str);
+                    //    }
+                    //    else if (cell.CellValue != null)
+                    //    {
+                    //        Debug.WriteLine(&quot;Cell contents: {0}&quot;, cell.CellValue.Text);
+                    //    }
+                    //}
+
+                    #endregion
+
+                    // Extract data rows
+                    result.Rows.Clear();
+                    #region foreach (Row row in rows)
+                    foreach (Row row in rows)
+                    {
+                        //var rowList = new List&lt;string&gt;();
+                        foreach (Cell cell in row.Elements&lt;Cell&gt;())
+                        {
+                            string value = CellValue_AsStr(cell, sharedStringTable);
+                            StringValue ref1 = cell.CellReference;
+                            result.Value_Set(ref1, value);
+
+                            // Test writing =========================
+                            //ConstructCellValue(cell, ref1);
+
+                            Debug.WriteLine($&quot;Cell ref &#39;{ref1}&#39;: {value}&quot;);
+                            //rowList.Add(value);
+                        }
+                        //result.Rows.Add(rowList);
+                    }
+                    #endregion
+
+                    // Test writing
+                    worksheet.WorksheetPart.Worksheet.Save();
+                    spreadsheetDocument.Close();
+                }
+            }
+            // Normalise the result
+            return result;
+        }
+
+        /// &lt;summary&gt;Compares two data sheets and return the differences.&lt;/summary&gt;
+        /// &lt;param name=&quot;inputFile&quot;&gt;The file input.&lt;/param&gt;
+        /// &lt;param name=&quot;inputSheet&quot;&gt;The input sheet.&lt;/param&gt;
+        /// &lt;param name=&quot;resultFile&quot;&gt;The result file.&lt;/param&gt;
+        /// &lt;param name=&quot;resultSheet&quot;&gt;The result sheet.&lt;/param&gt;
+        /// &lt;param name=&quot;returnValue&quot;&gt;The return value.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public List&lt;string&gt; CompareDataSheet(string inputFile, string inputSheet, string resultFile, string resultSheet, enExcel_FindReturnValue returnValue = enExcel_FindReturnValue.CellAddress)
+        {
+            pcExcelData_ input1 = ExcelFile_LoadAsExcelData(inputFile, inputSheet);
+            pcExcelData_ result1 = ExcelFile_LoadAsExcelData(resultFile, resultSheet);
+
+            return _lamed.lib.Excel.Data.CompareDataSheet(input1, result1);
+        }
+
+        /// &lt;summary&gt;Load the CSV file.&lt;/summary&gt;
+        /// &lt;param name=&quot;csvFilename&quot;&gt;The CSV filename.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public pcExcelData_ csvLoadFromFile(string csvFilename)
+        {
+            // Read the CSV file and populate the data structure
+            var result = new pcExcelData_();
+            string[] lines = _lamed.lib.IO.RW.File_Read2StrArray(csvFilename);
+            _lamed.lib.Excel.Csv.DataRows_FromCsvLines(result.Rows, lines);
+            return result;
+        }
+
+        #region private
+
+        internal int Row_Count(Worksheet worksheet)
+        {
+            IEnumerable&lt;Row&gt; rows = Rows(worksheet);
+            long result = rows.LongCount();
+            return (int)result;
+        }
+
+        internal IEnumerable&lt;Row&gt; Rows(Worksheet worksheet)
+        {
+            IEnumerable&lt;Row&gt; rows = worksheet.Descendants&lt;Row&gt;();
+            return rows;
+        }
+
+        //private IEnumerable&lt;Cell&gt; Cells(Worksheet worksheet)
+        //{
+        //    IEnumerable&lt;Cell&gt; cells = worksheet.Descendants&lt;Cell&gt;();
+        //    return cells;
+        //}
+
+        /// &lt;summary&gt;Constructs the cell value.&lt;/summary&gt;
+        /// &lt;param name=&quot;value&quot;&gt;The value.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        internal void ConstructCellValue(Cell cell, string value)
+        {
+            if (_lamed.Types.Test.IsNumeric(value))
+            {
+                ConstructCellValue(cell, value, CellValues.Number);
+                //CellValue v = new CellValue();
+                //v.Text = value;
+                //cell.AppendChild(v);
+            }
+            else ConstructCellValue(cell, value, CellValues.String);
+        }
+
+        ///// &lt;summary&gt;Constructs the cell value.&lt;/summary&gt;
+        ///// &lt;param name=&quot;value&quot;&gt;The value.&lt;/param&gt;
+        ///// &lt;returns&gt;&lt;/returns&gt;
+        //private void ConstructCellValue(Cell cell, string value, SharedStringTablePart shareStringPart)
+        //{
+        //    if (_lamed.Types.String.IsNumeric(value)) ConstructCellValue(cell, value, CellValues.Number);
+        //    else
+        //    {
+        //        int index = InsertSharedStringItem(value, shareStringPart);
+        //        ConstructCellValue(cell, value, CellValues.String);
+        //    }
+        //}
+
+        /// &lt;summary&gt;Constructs the cell value.&lt;/summary&gt;
+        /// &lt;param name=&quot;cell&quot;&gt;The cell.&lt;/param&gt;
+        /// &lt;param name=&quot;value&quot;&gt;The value.&lt;/param&gt;
+        /// &lt;param name=&quot;dataType&quot;&gt;Type of the data.&lt;/param&gt;
+        private void ConstructCellValue(Cell cell, string value, CellValues dataType)
+        {
+            cell.CellValue = new CellValue(value);
+            cell.DataType = new EnumValue&lt;CellValues&gt;(dataType);
+        }
+
+        internal WorksheetPart WorksheetPart_FromName(WorkbookPart workbookPart, string sheetName = &quot;&quot;)
+        {
+            //if (sheetName == &quot;&quot;) return workbookPart.WorksheetParts.Last();
+
+            Sheets sheets = workbookPart.Workbook.GetFirstChild&lt;Sheets&gt;();
+            var total = sheets.Count();
+            if (total == 0) return null; // The specified worksheet does not exist.
+
+            IEnumerable&lt;Sheet&gt; sheetsName = sheets.Elements&lt;Sheet&gt;().Where(s =&gt; s.Name == sheetName);
+            var sheet1 = sheetsName.FirstOrDefault();
+            if (sheet1 == null)
+            {
+                if (sheetName != &quot;&quot;)
+                {
+                    ($&quot;Error! Worksheet with name &#39;{sheetName}&#39; was not found!&quot;).zException_Show();
+                }
+
+                // The Sheet name was not found; return the first visible sheet
+                foreach (Sheet sheet in sheets.Elements&lt;Sheet&gt;())
+                {
+                    if (sheet.State == null || (sheet.State != null &amp;&amp; sheet.State.HasValue &amp;&amp; sheet.State.Value == SheetStateValues.Visible))
+                    {
+                        sheet1 = sheet;
+                        break;
+                    }
+                }
+            }
+
+            // if (sheet1 == null) return null; // &lt;==================[  Unit test required for this condition
+
+            string relationshipId = sheet1.Id.Value;
+            WorksheetPart worksheetPart = (WorksheetPart)workbookPart.GetPartById(relationshipId);
+            return worksheetPart;
+        }
+
+        /// &lt;summary&gt;Return the value of the Cell.&lt;/summary&gt;
+        /// &lt;param name=&quot;cell&quot;&gt;The cell.&lt;/param&gt;
+        /// &lt;param name=&quot;sharedStringTable&quot;&gt;The shared string table.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        internal string CellValue_AsStr(Cell cell, SharedStringTable sharedStringTable)
+        {
+            if (cell.CellValue == null) return &quot;&quot;;
+            string result = cell.CellValue.Text;
+            if (_lamed.Types.Test.IsNumeric(result) == false) return result;  // This is text
+
+            if ((cell.DataType != null) &amp;&amp; (cell.DataType == CellValues.SharedString))
+            {
+                int ssid = Int32.Parse(result);
+                result = sharedStringTable.ChildElements[ssid].InnerText;
+                //Debug.WriteLine(&quot;Shared string {0}: {1}&quot;.zFormat(ssid, result));
+            }
+
+            return result;
+        }
+        #endregion
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[25,33,25,108,0],[26,63,26,136,0],[40,26,40,119,0],[195,29,195,41,0],[204,17,204,18,0],[24,9,24,10,1],[25,13,25,32,1],[26,13,26,62,1],[28,13,28,45,1],[29,20,29,126,1],[30,13,30,14,1],[31,24,31,92,1],[32,17,32,18,1],[34,21,34,82,1],[36,21,36,134,1],[38,21,38,60,1],[39,25,39,80,1],[41,21,41,99,1],[44,21,44,99,1],[45,21,45,67,1],[47,21,47,61,1],[48,21,48,86,1],[73,21,73,41,1],[75,21,75,28,1],[75,41,75,45,1],[75,30,75,37,1],[76,21,76,22,1],[78,25,78,32,1],[78,47,78,67,1],[78,34,78,43,1],[79,25,79,26,1],[80,29,80,85,1],[81,29,81,67,1],[82,29,82,59,1],[87,29,87,76,1],[89,25,89,26,1],[78,44,78,46,1],[91,21,91,22,1],[75,38,75,40,1],[95,21,95,62,1],[96,21,96,49,1],[97,17,97,18,1],[98,13,98,14,1],[100,13,100,27,1],[101,9,101,10,1],[111,9,111,10,1],[112,13,112,84,1],[113,13,113,87,1],[115,13,115,76,1],[116,9,116,10,1],[122,9,122,10,1],[124,13,124,45,1],[125,13,125,79,1],[126,13,126,76,1],[127,13,127,27,1],[128,9,128,10,1],[133,9,133,10,1],[134,13,134,53,1],[135,13,135,44,1],[136,13,136,32,1],[137,9,137,10,1],[140,9,140,10,1],[141,13,141,66,1],[142,13,142,25,1],[143,9,143,10,1],[155,9,155,10,1],[156,13,156,52,1],[157,13,157,14,1],[158,17,158,68,1],[162,13,162,14,1],[163,18,163,69,1],[164,9,164,10,1],[184,9,184,10,1],[185,13,185,51,1],[186,13,186,65,1],[187,9,187,10,1],[190,9,190,10,1],[193,13,193,75,1],[194,13,194,40,1],[195,13,195,28,1],[197,13,197,81,1],[197,100,197,102,1],[198,13,198,54,1],[199,13,199,32,1],[200,13,200,14,1],[201,17,201,37,1],[202,17,202,18,1],[203,21,203,100,1],[207,17,207,24,1],[207,41,207,65,1],[207,26,207,37,1],[208,17,208,18,1],[209,21,209,143,1],[210,21,210,22,1],[211,25,211,40,1],[212,25,212,31,1],[214,17,214,18,1],[207,38,207,40,1],[215,13,215,14,1],[219,13,219,53,1],[220,13,220,99,1],[221,13,221,34,1],[222,9,222,10,1],[229,9,229,10,1],[230,13,230,40,1],[230,41,230,51,1],[231,13,231,49,1],[232,13,232,62,1],[232,63,232,77,1],[234,13,234,87,1],[235,13,235,14,1],[236,17,236,48,1],[237,17,237,74,1],[239,13,239,14,1],[241,13,241,27,1],[242,9,242,10,1],[17,9,17,70,1],[197,81,197,100,1]]);
+    </script>
+  </body>
+</html>

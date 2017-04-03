@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classntbody\methodnt\methodntcomment\methodntcomment_parameter\methodntcomment_parameter_methods.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT.MethodNTComment.MethodNTComment_Parameter
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.VS_Static)]
+    public static class MethodNTComment_Parameter_Methods
+    {
+        /// &lt;summary&gt;
+        /// Parameter values from the  XML parameter line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;paramLine&quot;&gt;The parameter line&lt;/param&gt;
+        /// &lt;param name=&quot;nameValue&quot;&gt;Return the name value&lt;/param&gt;
+        /// &lt;param name=&quot;commentValue&quot;&gt;The comment value.&lt;/param&gt;
+        public static void Parameter_FromXML(string paramLine, out string nameValue, out string commentValue)
+        {
+            commentValue = LamedalCore_.Instance.lib.XML.Setup.XML_Attribute(paramLine, &quot;param&quot;, &quot;name&quot;, out nameValue);
+        }
+
+        /// &lt;summary&gt;Create string from setup XML parameter definition.&lt;/summary&gt;
+        /// &lt;param name=&quot;parameterName&quot;&gt;The parameter name.&lt;/param&gt;
+        /// &lt;param name=&quot;helpStr&quot;&gt;The help string.&lt;/param&gt;
+        /// &lt;param name=&quot;convertToValidXML&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [convert to valid XML].&lt;/param&gt;
+        /// &lt;param name=&quot;add3SlashLines&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [add3 slash lines].&lt;/param&gt;
+        /// &lt;returns&gt;string&lt;/returns&gt;
+        public static string Parameter_ToXML(string parameterName, string helpStr, bool convertToValidXML = false, bool add3SlashLines = false)
+        {
+            var space = ClassNT_Methods.codeSpace;
+            if (add3SlashLines) space += &quot;/// &quot;;
+            if (convertToValidXML) helpStr = LamedalCore_.Instance.lib.XML.Setup.Fix_InvalidXML(helpStr);
+            var result = space + &quot;&lt;param name=\&quot;&quot; + parameterName + &quot;\&quot;&gt;&quot; + helpStr + &quot;&lt;/param&gt;&quot;.NL();
+            return result;
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[17,9,17,10,1],[18,13,18,121,1],[19,9,19,10,1],[28,9,28,10,1],[29,13,29,51,1],[30,13,30,32,1],[30,33,30,49,1],[31,13,31,35,1],[31,36,31,106,1],[32,13,32,103,1],[33,13,33,27,1],[34,9,34,10,1]]);
+    </script>
+  </body>
+</html>

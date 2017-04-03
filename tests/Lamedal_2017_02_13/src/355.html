@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\about\about_.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using LamedalCore.lib.Excel;
+
+namespace LamedalCore.lib.About
+{
+    public sealed class About_
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance;
+
+        #region Console
+        /// &lt;summary&gt;Shows a message abouts the Lamedal library.&lt;/summary&gt;
+        public void Console_About()
+        {
+            _lamed.lib.Console.IO.About_();
+        }
+
+        /// &lt;summary&gt;Shows a Hello World console message.&lt;/summary&gt;
+        public void HelloWorld()
+        {
+            _lamed.lib.Console.IO.About_HelloWorld_();
+        }
+        #endregion
+
+        /// &lt;summary&gt;Return the Assembly of Lamedal library.&lt;/summary&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public Assembly Assembly()
+        {
+            return typeof(LamedalCore_).GetTypeInfo().Assembly;
+        }
+
+        #region Excel
+        /// &lt;summary&gt;
+        /// Gets the About library methods.
+        /// &lt;/summary&gt;
+        public Excel_About Excel
+        {
+            get { return _Excel ?? (_Excel = new Excel_About()); }
+        }
+        private Excel_About _Excel;
+        #endregion
+
+        /// &lt;summary&gt;Return the machine name.&lt;/summary&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string MachineName()
+        {
+            return Environment.MachineName;
+        }
+
+        /// &lt;summary&gt;Return the stack trace.&lt;/summary&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string StackTrace()
+        {
+            return Environment.StackTrace;
+        }
+
+        /// &lt;summary&gt;Return the processor count.&lt;/summary&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public int ProcessorCount()
+        {
+            return Environment.ProcessorCount;
+        }
+
+        /// &lt;summary&gt;Return the tick count.&lt;/summary&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public int TickCount()
+        {
+            return Environment.TickCount;
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[17,9,17,10,1],[18,13,18,44,1],[19,9,19,10,1],[23,9,23,10,1],[24,13,24,55,1],[25,9,25,10,1],[31,9,31,10,1],[32,13,32,64,1],[33,9,33,10,1],[41,17,41,18,1],[41,19,41,65,1],[41,66,41,67,1],[49,9,49,10,1],[50,13,50,44,1],[51,9,51,10,1],[56,9,56,10,1],[57,13,57,43,1],[58,9,58,10,1],[63,9,63,10,1],[64,13,64,47,1],[65,9,65,10,1],[70,9,70,10,1],[71,13,71,42,1],[72,9,72,10,1],[12,9,12,70,1]]);
+    </script>
+  </body>
+</html>

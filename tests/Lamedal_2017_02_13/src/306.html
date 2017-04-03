@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classntbody\methodnt\methodnt_.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Xml.Serialization;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttribute.ClassNTBlueprintRule;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttributes;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT.MethodNTComment;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT.MethodNTHeader;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT.MethodNTstats;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT
+{
+    [Serializable]
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_State)]
+    [DebuggerDisplay(&quot;Name = {MethodName}&quot;)]
+    public sealed class MethodNT_
+    {
+        public string MethodName;                               // Readonly refenerce to MethodName
+        public MethodNTComment_ Comment;
+        // Attributes
+        public List&lt;string&gt; Attribute_Lines;
+        public ClassNTAttributes_ Attribute_Breakdown;
+        public ClassNTBlueprintMethodRule_ Attribute_Rule;
+        public ClassNTBlueprintMethodRuleAliasDef_ Attribute_Alias;
+        public MethodNTHeader_ Header;
+        public MethodNTstats_ Statistics;
+
+        [XmlIgnore]
+        public ClassNT_ ParentClass;
+        public string ParentClassName;                          // Sometimes only the method code is analysed within a class. The classname is stored for quick reference to context
+        public List&lt;string&gt; SourceCode;                         // Source code of the class body 
+
+        public static MethodNT_ Create(string source, string parentClassName)
+        {
+            List&lt;string&gt; sourceLines = new List&lt;string&gt;();
+            source.zConvert_Array_FromStr(&quot;&quot;.NL()).zTo_List(sourceLines);
+            int ii = 0;
+            return Create(sourceLines, ref ii, -1, parentClassName: parentClassName);
+        }
+
+        public static MethodNT_ Create(List&lt;string&gt; sourceLines, ref int ii, int iiMethodEnd, ClassNT_ parentClass = null, string parentClassName = &quot;&quot;)
+        {
+            var result = new MethodNT_(); // {Name = name, Value = value};
+            // Execute static method to populate result parameters
+            result.ParentClass = parentClass;
+            if (parentClass != null) result.ParentClassName = parentClass.ClassName;
+            else if (parentClassName != &quot;&quot;) result.ParentClassName = parentClassName;
+
+            MethodNT_Methods.Method_Parse(sourceLines, ref ii, iiMethodEnd, out result.MethodName, out result.SourceCode, out result.Comment,
+                    out result.Attribute_Lines, out result.Attribute_Breakdown, out result.Attribute_Rule, out result.Attribute_Alias, 
+                    out result.Header, out result.Statistics);
+
+            MethodNT_Methods.SyncParametersWithComments(result.Header, result.Comment);   // Sync comments to the header parameters
+            //result.MethodName = result.Header.Header_Name;
+            return result;
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[37,9,37,10,1],[38,13,38,59,1],[39,13,39,74,1],[40,13,40,24,1],[41,13,41,86,1],[42,9,42,10,1],[45,9,45,10,1],[46,13,46,42,1],[48,13,48,46,1],[49,13,49,37,1],[49,38,49,85,1],[50,18,50,44,1],[50,45,50,86,1],[52,13,54,63,1],[56,13,56,88,1],[58,13,58,27,1],[59,9,59,10,1]]);
+    </script>
+  </body>
+</html>

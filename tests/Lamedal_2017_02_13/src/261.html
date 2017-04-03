@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\types\string\string_specialchar.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+
+/*
+Decimal   ASCII     Hex
+0         control   00
+1         control   01
+2         control   02
+3         control   03
+4         control   04
+5         control   05
+6         control   06
+7         control   07
+8         control   08
+9         \t        09
+10        \n        0A
+11        \v        0B
+12        \f        0C
+13        \r        0D
+14        control   0E
+15        control   0F
+16        control   10
+17        control   11
+18        control   12
+19        control   13
+20        control   14
+21        control   15
+22        control   16
+23        control   17
+24        control   18
+25        control   19
+26        control   1A
+27        control   1B
+28        control   1C
+29        control   1D
+30        control   1E
+31        control   1F
+32        space     20
+33        !         21
+34        &quot;         22
+35        #         23
+36        $         24
+37        %         25
+38        &amp;         26
+39        &#39;         27
+40        (         28
+41        )         29
+42        *         2A
+43        +         2B
+44        ,         2C
+45        -         2D
+46        .         2E
+47        /         2F
+48        0         30
+49        1         31
+50        2         32
+51        3         33
+52        4         34
+53        5         35
+54        6         36
+55        7         37
+56        8         38
+57        9         39
+58        :         3A
+59        ;         3B
+60        &lt;         3C
+61        =         3D
+62        &gt;         3E
+63        ?         3F
+64        @         40
+65        A         41
+66        B         42
+67        C         43
+68        D         44
+69        E         45
+70        F         46
+71        G         47
+72        H         48
+73        I         49
+74        J         4A
+75        K         4B
+76        L         4C
+77        M         4D
+78        N         4E
+79        O         4F
+80        P         50
+81        Q         51
+82        R         52
+83        S         53
+84        T         54
+85        U         55
+86        V         56
+87        W         57
+88        X         58
+89        Y         59
+90        Z         5A
+91        [         5B
+92        \         5C
+93        ]         5D
+94        ^         5E
+95        _         5F
+96        `         60
+97        a         61
+98        b         62
+99        c         63
+100       d         64
+101       e         65
+102       f         66
+103       g         67
+104       h         68
+105       i         69
+106       j         6A
+107       k         6B
+108       l         6C
+109       m         6D
+110       n         6E
+111       o         6F
+112       p         70
+113       q         71
+114       r         72
+115       s         73
+116       t         74
+117       u         75
+118       v         76
+119       w         77
+120       x         78
+121       y         79
+122       z         7A
+123       {         7B
+124       |         7C
+125       }         7D
+126       ~         7E
+127       control   7F 
+*/
+
+namespace LamedalCore.Types.String
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action, DefaultType = typeof(string), GroupName = &quot;Str&quot;)]
+    public sealed class String_SpecialChar
+    {
+        #region private settings
+        private char char_copyright = &#39;\u00a9&#39;;
+        private char char_cross = &#39;\u2020&#39;;
+        private char char_crossdouble = &#39;\u2021&#39;;
+        private char char_registered = &#39;\u00ae&#39;;
+        private char char_trademark = &#39;\u2122&#39;;
+        //private string func_alarm = &quot;\a&quot;;
+        private char func_alarm_ = &#39;\u0007&#39;;
+        //private string func_backspace = &quot;\b&quot;;
+        private char func_backspace_ = &#39;\u0008&#39;;
+        private char func_del = &#39;\u007f&#39;;
+        private char func_escape_ = &#39;\u001B&#39;;
+        private char func_tab_ = &#39;\u0009&#39;;
+        private char math_3quoter = &#39;\u00be&#39;;
+        private char math_degree = &#39;\u00b0&#39;;
+        private char math_division = &#39;\u00f7&#39;;
+        private char math_function = &#39;\u0192&#39;;
+        private char math_half = &#39;\u00bd&#39;;
+        private char math_plusMinus = &#39;\u00b1&#39;;
+        private char math_power2 = &#39;\u00b2&#39;;
+        private char math_power3 = &#39;\u00b3&#39;;
+        private char math_quoter = &#39;\u00bc&#39;;
+        private char money_cent = &#39;\u00a2&#39;;
+        private char money_euro = &#39;\u20ac&#39;;
+        private char money_pound = &#39;\u00a3&#39;;
+        private char money_yen = &#39;\u00a5&#39;;
+        //private char func_carriageReturn_ = &#39;\u000D&#39;;
+        //private string func_carriageReturn = &quot;\r&quot;;
+
+        //private char func_NewLine_ = &#39;\u000A&#39;;
+        //private string func_NewLine = &quot;\n&quot;;
+        //private string func_tab = &quot;\t&quot;;
+        //private char func_formfeed_ = &#39;\u000c&#39;;  // \f
+        //private string func_formfeed = &quot;\f&quot;;
+        #endregion
+
+
+        /// &lt;summary&gt;
+        /// Add copyright to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Char_Copyright(string line, int total = 1)
+        {
+            line += new string(char_copyright, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add cross to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Char_Cross(string line, int total = 1)
+        {
+            line += new string(char_cross, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add a double cross to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Char_CrossDouble(string line, int total = 1)
+        {
+            line += new string(char_crossdouble, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add registered to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Char_Registered(string line, int total = 1)
+        {
+            line += new string(char_registered, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add trademark to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Char_Trademark(string line, int total = 1)
+        {
+            line += new string(char_trademark, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add tab to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Function_Alarm(string line, int total = 1)
+        {
+            line += new string(func_alarm_, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add backspace to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Function_Backspace(string line, int total = 1)
+        {
+            line += new string(func_backspace_, total);
+            return line;
+        }
+        /// &lt;summary&gt;
+        /// Add del to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        [Test_IgnoreCoverage(enTestIgnore.FrontendCode)]
+        public string Function_Del(string line, int total = 1)
+        {
+            line += new string(func_del, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add escape to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        [Test_IgnoreCoverage(enTestIgnore.FrontendCode)]
+        public string Function_ESC(string line, int total = 1)
+        {
+            line += new string(func_escape_, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add enters to line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Function_NL(string line, int total = 1)
+        {
+            string result = line;
+            for (int ii = 0; ii &lt; total; ii++) result += Environment.NewLine;
+            return result;
+        }
+
+        /// &lt;summary&gt;
+        /// Add tab to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Function_TAB(string line, int total = 1)
+        {
+            line += new string(func_tab_, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add 3 quoters to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Math_QuoterOf3(string line, int total = 1)
+        {
+            line += new string(math_3quoter, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add a degree to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Math_Degree(string line, int total = 1)
+        {
+            line += new string(math_degree, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add a division sign to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Math_Division(string line, int total = 1)
+        {
+            line += new string(math_division, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add function to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Math_Function(string line, int total = 1)
+        {
+            line += new string(math_function, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add a half to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Math_Half(string line, int total = 1)
+        {
+            line += new string(math_half, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add plus minus to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Math_PlusMinus(string line, int total = 1)
+        {
+            line += new string(math_plusMinus, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add power 2 to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Math_Power2(string line, int total = 1)
+        {
+            line += new string(math_power2, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add power 3 to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Math_Power3(string line, int total = 1)
+        {
+            line += new string(math_power3, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add quoter to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Math_Quoter(string line, int total = 1)
+        {
+            line += new string(math_quoter, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add cent sign to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Money_Cent(string line, int total = 1)
+        {
+            line += new string(money_cent, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add euro sign to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Money_Euro(string line, int total = 1)
+        {
+            line += new string(money_euro, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add pound sign to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Money_Pound(string line, int total = 1)
+        {
+            line += new string(money_pound, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;
+        /// Add yen sign to the specified line.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;line&quot;&gt;The line.&lt;/param&gt;
+        /// &lt;param name=&quot;total&quot;&gt;The total.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string Money_Yen(string line, int total = 1)
+        {
+            line += new string(money_yen, total);
+            return line;
+        }
+
+        /// &lt;summary&gt;Removes the special characters.&lt;/summary&gt;
+        /// &lt;param name=&quot;str&quot;&gt;The string.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public string SpecialCharacters_Remove(string str)
+        {
+            var sb = new StringBuilder();
+            foreach (char c in str)
+            {
+                if ((c &gt;= &#39;0&#39; &amp;&amp; c &lt;= &#39;9&#39;) || (c &gt;= &#39;A&#39; &amp;&amp; c &lt;= &#39;Z&#39;) || (c &gt;= &#39;a&#39; &amp;&amp; c &lt;= &#39;z&#39;) || c == &#39;.&#39; || c == &#39;_&#39;)
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
+        }
+        /// &lt;summary&gt;
+        /// Determines whether [has special chars] [the specified your string].
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;yourString&quot;&gt;Your string.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool SpecialChars_Check(string yourString)
+        {
+            return yourString.Any(ch =&gt; !Char.IsLetterOrDigit(ch));
+        }
+
+        /// &lt;summary&gt;
+        /// Determines whether [has special chars] [the specified your string].
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;yourString&quot;&gt;Your string.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool SpecialChars_Check2(string yourString)
+        {
+            var regexItem = new Regex(&quot;^[a-zA-Z0-9 ]*$&quot;);
+            return (!regexItem.IsMatch(yourString));
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[191,9,191,10,1],[192,13,192,55,1],[193,13,193,25,1],[194,9,194,10,1],[203,9,203,10,1],[204,13,204,51,1],[205,13,205,25,1],[206,9,206,10,1],[215,9,215,10,1],[216,13,216,57,1],[217,13,217,25,1],[218,9,218,10,1],[227,9,227,10,1],[228,13,228,56,1],[229,13,229,25,1],[230,9,230,10,1],[239,9,239,10,1],[240,13,240,55,1],[241,13,241,25,1],[242,9,242,10,1],[251,9,251,10,1],[252,13,252,52,1],[253,13,253,25,1],[254,9,254,10,1],[263,9,263,10,1],[264,13,264,56,1],[265,13,265,25,1],[266,9,266,10,1],[300,9,300,10,1],[301,13,301,34,1],[302,18,302,28,1],[302,48,302,78,1],[302,42,302,46,1],[302,30,302,40,1],[303,13,303,27,1],[304,9,304,10,1],[313,9,313,10,1],[314,13,314,50,1],[315,13,315,25,1],[316,9,316,10,1],[325,9,325,10,1],[326,13,326,53,1],[327,13,327,25,1],[328,9,328,10,1],[337,9,337,10,1],[338,13,338,52,1],[339,13,339,25,1],[340,9,340,10,1],[349,9,349,10,1],[350,13,350,54,1],[351,13,351,25,1],[352,9,352,10,1],[361,9,361,10,1],[362,13,362,54,1],[363,13,363,25,1],[364,9,364,10,1],[373,9,373,10,1],[374,13,374,50,1],[375,13,375,25,1],[376,9,376,10,1],[385,9,385,10,1],[386,13,386,55,1],[387,13,387,25,1],[388,9,388,10,1],[397,9,397,10,1],[398,13,398,52,1],[399,13,399,25,1],[400,9,400,10,1],[409,9,409,10,1],[410,13,410,52,1],[411,13,411,25,1],[412,9,412,10,1],[421,9,421,10,1],[422,13,422,52,1],[423,13,423,25,1],[424,9,424,10,1],[433,9,433,10,1],[434,13,434,51,1],[435,13,435,25,1],[436,9,436,10,1],[445,9,445,10,1],[446,13,446,51,1],[447,13,447,25,1],[448,9,448,10,1],[457,9,457,10,1],[458,13,458,52,1],[459,13,459,25,1],[460,9,460,10,1],[469,9,469,10,1],[470,13,470,50,1],[471,13,471,25,1],[472,9,472,10,1],[478,9,478,10,1],[479,13,479,42,1],[480,13,480,20,1],[480,32,480,35,1],[480,22,480,28,1],[481,13,481,14,1],[482,17,482,120,1],[483,17,483,18,1],[484,21,484,34,1],[485,17,485,18,1],[486,13,486,14,1],[480,29,480,31,1],[487,13,487,34,1],[488,9,488,10,1],[495,9,495,10,1],[496,13,496,41,1],[496,66,496,68,1],[497,9,497,10,1],[505,9,505,10,1],[506,13,506,58,1],[507,13,507,53,1],[508,9,508,10,1],[148,9,148,48,1],[149,9,149,44,1],[150,9,150,50,1],[151,9,151,49,1],[152,9,152,48,1],[154,9,154,45,1],[156,9,156,49,1],[157,9,157,42,1],[158,9,158,46,1],[159,9,159,43,1],[160,9,160,46,1],[161,9,161,45,1],[162,9,162,47,1],[163,9,163,47,1],[164,9,164,43,1],[165,9,165,48,1],[166,9,166,45,1],[167,9,167,45,1],[168,9,168,45,1],[169,9,169,44,1],[170,9,170,44,1],[171,9,171,45,1],[172,9,172,43,1],[496,41,496,66,1]]);
+    </script>
+  </body>
+</html>

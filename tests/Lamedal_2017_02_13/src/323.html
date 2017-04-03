@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classntattribute\classntblueprintrule\classntblueprintmethodrulealiasdef_.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttribute.ClassNTBlueprintRule
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_State)]
+    public sealed class ClassNTBlueprintMethodRuleAliasDef_ : BlueprintRule_MethodAliasDefAttribute
+    {
+        public static ClassNTBlueprintMethodRuleAliasDef_ Create(string attributeCode)
+        {
+            var result = new ClassNTBlueprintMethodRuleAliasDef_(); 
+            // Execute static method to populate result parameters
+            string attrinuteName;
+            string mirrorClass;
+            ClassNTBlueprintMethodRuleAliasDef_Methods.Attribute_AliasDefinition(attributeCode, out attrinuteName, out result.MirrorParameter1, out mirrorClass, out result.MirrorMethodName);
+            result.MirrorClass = Type.GetType(mirrorClass);  // If type cannot be found -&gt; do other conversions here
+            return result;
+        }
+
+        public static ClassNTBlueprintMethodRuleAliasDef_ Create(List&lt;string&gt; attributeLines)
+        {
+            foreach (string attLine in attributeLines)
+            {
+                if (BlueprintMethodAliasRuleIsIn(attLine)) return Create(attLine);
+            }
+            return null;
+        }
+
+        /// &lt;summary&gt;Identifies a Blueprint method rule.&lt;/summary&gt;
+        /// &lt;param name=&quot;codeLine&quot;&gt;The code line to be tested&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        private static bool BlueprintMethodAliasRuleIsIn(string codeLine)
+        {
+            if (_BlueprintMethodAliasRule1 == null)
+            {
+                _BlueprintMethodAliasRule1 = typeof(BlueprintRule_MethodAliasDefAttribute).Name;
+                _BlueprintMethodAliasRule2 = _BlueprintMethodAliasRule1.Replace(&quot;Attribute&quot;, &quot;&quot;);
+            }
+            return codeLine.zContains_Any(_BlueprintMethodAliasRule1,_BlueprintMethodAliasRule2);
+        }
+        private static string _BlueprintMethodAliasRule1 = null;
+        private static string _BlueprintMethodAliasRule2 = null;
+
+
+        private ClassNTBlueprintMethodRuleAliasDef_() { }  // Hide default constructor
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[13,9,13,10,1],[14,13,14,68,1],[18,13,18,191,1],[19,13,19,60,1],[20,13,20,27,1],[21,9,21,10,1],[24,9,24,10,1],[25,13,25,20,1],[25,40,25,54,1],[25,22,25,36,1],[26,13,26,14,1],[27,17,27,59,1],[27,60,27,83,1],[28,13,28,14,1],[25,37,25,39,1],[29,13,29,25,1],[30,9,30,10,1],[36,9,36,10,1],[37,13,37,52,1],[38,13,38,14,1],[39,17,39,97,1],[40,17,40,98,1],[41,13,41,14,1],[42,13,42,98,1],[43,9,43,10,1],[48,9,48,54,1],[48,55,48,56,1],[48,57,48,58,1],[44,9,44,65,1],[45,9,45,65,1]]);
+    </script>
+  </body>
+</html>

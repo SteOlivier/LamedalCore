@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classntattribute\classntattribute_.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttributes;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttribute
+{
+    [Serializable]
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_State)]
+    public sealed class ClassNTAttribute_
+    {
+        public string AttributeName;
+        public readonly List&lt;ClassNTAttribute_Parameter_&gt; Parameters = new List&lt;ClassNTAttribute_Parameter_&gt;();
+
+        public static ClassNTAttribute_ Create(string attributeStr)
+        {
+            var result = new ClassNTAttribute_();
+            List&lt;string&gt; parameterList;
+            ClassNTAttributes_Methods.Attribute_Parts(attributeStr, out result.AttributeName, out parameterList);
+            foreach (string parameterStr in parameterList)
+            {
+                var parameter = ClassNTAttribute_Parameter_.Create(result.AttributeName, parameterStr);
+                result.Parameters.Add(parameter);
+            }
+            return result;
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[17,9,17,10,1],[18,13,18,50,1],[20,13,20,114,1],[21,13,21,20,1],[21,45,21,58,1],[21,22,21,41,1],[22,13,22,14,1],[23,17,23,104,1],[24,17,24,50,1],[25,13,25,14,1],[21,42,21,44,1],[26,13,26,27,1],[27,9,27,10,1],[14,9,14,112,1]]);
+    </script>
+  </body>
+</html>

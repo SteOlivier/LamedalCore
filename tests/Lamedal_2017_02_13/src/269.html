@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\types\list\list_queue.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+
+namespace LamedalCore.Types.List
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action)]
+    public sealed class List_Queue
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance; // system library
+
+        /// &lt;summary&gt;
+        /// Treats list like a queue, appending &lt;paramref name=&quot;value&quot;/&gt;.
+        /// &lt;/summary&gt;
+        [DebuggerStepThrough]
+        public void Enqueue&lt;T&gt;(IList&lt;T&gt; list, T value)
+        {
+            _lamed.Types.List.Stack.Push(list,value);
+        }
+
+        /// &lt;summary&gt;
+        /// Treats list like a queue, removing and returning the
+        /// first value.
+        /// &lt;/summary&gt;
+        /// &lt;exception cref=&quot;InvalidOperationException&quot;&gt;
+        /// Thrown if list is empty.
+        /// &lt;/exception&gt;
+        [DebuggerStepThrough]
+        public T Dequeue&lt;T&gt;(IList&lt;T&gt; list)
+        {
+            if (list == null) throw new ArgumentNullException(nameof(list));
+            if (list.Count == 0) return _lamed.Types.Object.DefaultValue&lt;T&gt;();
+
+            var value = list.First();
+            list.RemoveAt(0);
+            return value;
+        }
+
+
+        /// &lt;summary&gt;Treats list like a stack, peeking and return the last value on the list.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;T&quot;&gt;&lt;/typeparam&gt;
+        /// &lt;param name=&quot;list&quot;&gt;The list.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        /// &lt;exception cref=&quot;System.ArgumentNullException&quot;&gt;list&lt;/exception&gt;
+        [DebuggerStepThrough]
+        public T Peek&lt;T&gt;(IList&lt;T&gt; list)
+        {
+            if (list == null) throw new ArgumentNullException(nameof(list));
+            if (list.Count == 0) return _lamed.Types.Object.DefaultValue&lt;T&gt;();
+
+            return list.First();
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[20,9,20,10,1],[21,13,21,54,1],[22,9,22,10,1],[33,9,33,10,1],[34,13,34,30,1],[34,31,34,77,1],[35,13,35,33,1],[35,34,35,79,1],[37,13,37,38,1],[38,13,38,30,1],[39,13,39,26,1],[40,9,40,10,1],[50,9,50,10,1],[51,13,51,30,1],[51,31,51,77,1],[52,13,52,33,1],[52,34,52,79,1],[54,13,54,33,1],[55,9,55,10,1],[13,9,13,70,1]]);
+    </script>
+  </body>
+</html>

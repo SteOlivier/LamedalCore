@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\words\words_loadlist1.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System.Collections.Generic;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.lib.Words.WordsList;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.Words
+{
+    /// &lt;summary&gt;
+    /// Load the word lists for use. This is a generated class
+    /// &lt;/summary&gt;
+    public sealed partial class Words_LoadList
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance;
+
+        /// &lt;summary&gt;Loads the word list.&lt;/summary&gt;
+        /// &lt;param name=&quot;wordList&quot;&gt;The word list.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public IList&lt;string&gt; LoadList(enWord_List wordList)
+        {
+            IList&lt;string&gt; result = null;
+            switch (wordList)
+            {
+              case enWord_List.Abbreviations : result = WordsList_Abbreviations.AbbreviationsList_Create(); break;
+              case enWord_List.Acronyms : result = WordsList_Acronyms.AcronymsList_Create(); break;
+                case enWord_List.CommonWords : result = WordsList_CommonWords.CommonWordsList_Create(); break;
+                case enWord_List.Prefixes : result = WordsList_Prefixes.PrefixesList_Create(); break;
+                case enWord_List.Properties : result = WordsList_Properties.PropertiesList_Create(); break;
+                case enWord_List.SimpleEnglishWords : result = WordsList_SimpleEnglishWords.SimpleEnglishWordsList_Create(); break;
+                case enWord_List.TypeNames : result = WordsList_TypeNames.TypeNamesList_Create(); break;
+                case enWord_List.VerbModifiers : result = WordsList_VerbModifiers.VerbModifiersList_Create(); break;
+                case enWord_List.Verbs : result = WordsList_Verbs.VerbsList_Create(); break;
+                case enWord_List.WordsNotToUse : result = WordsList_WordsNotToUse.WordsNotToUseList_Create(); break;
+            }
+            return result;
+        }
+
+    }
+
+}
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[20,9,20,10,1],[21,13,21,41,1],[22,13,22,30,1],[24,48,24,108,1],[24,109,24,115,1],[25,43,25,93,1],[25,94,25,100,1],[26,48,26,104,1],[26,105,26,111,1],[27,45,27,95,1],[27,96,27,102,1],[28,47,28,101,1],[28,102,28,108,1],[29,55,29,125,1],[29,126,29,132,1],[30,46,30,98,1],[30,99,30,105,1],[31,50,31,110,1],[31,111,31,117,1],[32,42,32,86,1],[32,87,32,93,1],[33,50,33,110,1],[33,111,33,117,1],[35,13,35,27,1],[36,9,36,10,1],[14,9,14,70,1]]);
+    </script>
+  </body>
+</html>

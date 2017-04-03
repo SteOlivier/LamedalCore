@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classntbody\methodnt\methodntheader\methodntheader_parameter\methodntheader_parameter_.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System.Diagnostics;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT.MethodNTHeader.MethodNTHeader_Parameter
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_State)]
+    [DebuggerDisplay(&quot;Name = {ParameterName}; Value = {ParameterValue}&quot;)]
+    public sealed class MethodNTHeader_Parameter_
+    {
+        public bool ParmeterIsThis;
+        public enParameterRefType ParameterRefType = enParameterRefType.ByValue;
+        public string ParameterTypeName;
+        public string ParameterName;
+        public string ParameterValue;
+        public string ParameterSourceLine;
+        public string ParameterComment;         // This is assigned at a later stage.
+
+        public static MethodNTHeader_Parameter_ Create(string parametersLine)
+        {
+            var result = new MethodNTHeader_Parameter_(); // {Name = name, Value = value};
+            // Execute static method to populate result parameters
+            result.ParameterSourceLine = parametersLine;
+            MethodNTHeader_Parameter_Methods.Parameter_Parts(ref parametersLine, out result.ParmeterIsThis, out result.ParameterRefType, out result.ParameterTypeName, out result.ParameterName, out result.ParameterValue);
+            return result;
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[20,9,20,10,1],[21,13,21,58,1],[23,13,23,57,1],[24,13,24,221,1],[25,13,25,27,1],[26,9,26,10,1],[12,9,12,81,1]]);
+    </script>
+  </body>
+</html>

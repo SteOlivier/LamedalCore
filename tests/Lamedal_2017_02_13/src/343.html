@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\io\io_stateinfo\io_stateinfo_singleton.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+namespace LamedalCore.lib.IO.IO_StateInfo
+{
+    public sealed class IO_StateInfo_Singleton
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance;
+
+        private IO_StateInfo_RW1 _info1;
+        private IO_StateInfo_RW2 _info2;
+
+        #region Singleton of StateInfo_IO_1lvl
+        private static readonly IO_StateInfo_Singleton _StateInfo_IO_1lvl = new IO_StateInfo_Singleton();  // This is the only instance of this class
+
+        private IO_StateInfo_Singleton()
+        {
+            // Private constructor prevents creation by external clients
+        }
+
+        /// &lt;summary&gt;
+        /// Return Instance of StateInfo_4Forms
+        /// &lt;/summary&gt;
+        public static IO_StateInfo_Singleton Instance
+        {
+            get { return _StateInfo_IO_1lvl; }
+        }
+
+        #endregion
+
+        /// &lt;summary&gt;Returns the level state information.&lt;/summary&gt;
+        /// &lt;param name=&quot;level&quot;&gt;The level.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public IO_StateInfo_RW Level(int level=1)
+        {
+            if (level == 1) return _info1 ?? (_info1 = new IO_StateInfo_RW1());
+
+            // Assume level = 2
+            return _info2 ?? (_info2 = new IO_StateInfo_RW2());
+        }
+
+        /// &lt;summary&gt;Resets state memory.&lt;/summary&gt;
+        public void Reset()
+        {
+            Reset(1);
+            Reset(2);
+        }
+        /// &lt;summary&gt;Resets state memory.&lt;/summary&gt;
+        public void Reset(int level)
+        {
+            Level(level).Delete();
+            if (level == 1) _info1 = null;
+            if (level == 2) _info2 = null;
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[5,9,5,70,1],[13,9,13,41,1],[14,9,14,10,1],[16,9,16,10,1],[23,17,23,18,1],[23,19,23,45,1],[23,46,23,47,1],[32,9,32,10,1],[33,13,33,28,1],[33,29,33,80,1],[36,13,36,64,1],[37,9,37,10,1],[41,9,41,10,1],[42,13,42,22,1],[43,13,43,22,1],[44,9,44,10,1],[47,9,47,10,1],[48,13,48,35,1],[49,13,49,28,1],[49,29,49,43,1],[50,13,50,28,1],[50,29,50,43,1],[51,9,51,10,1],[11,9,11,106,1]]);
+    </script>
+  </body>
+</html>

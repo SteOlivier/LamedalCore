@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classntattribute\classntattribute_parameter_.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttribute
+{
+    [Serializable]
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_State)]
+    public sealed class ClassNTAttribute_Parameter_
+    {
+        public string Name;
+        public object Value;
+        public bool IsEnumeral = false;  // Test for &quot;en*.*&quot;
+
+        /// &lt;summary&gt;
+        /// Setups the parameter from the attribute name.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;attributeName&quot;&gt;The attribute name&lt;/param&gt;
+        /// &lt;param name=&quot;parameterStr&quot;&gt;The parameter string&lt;/param&gt;
+        /// &lt;returns&gt;MethodNTAttribute_Parameter&lt;/returns&gt;
+        public static ClassNTAttribute_Parameter_ Create(string attributeName, string parameterStr)
+        {
+            string name;
+            object value;
+            bool isEnum;
+            ClassNTAttribute_Parameter_Methods.Attribute_Parameter(attributeName, parameterStr, out name, out value, out isEnum);
+
+            return new ClassNTAttribute_Parameter_ {Name = name, Value = value, IsEnumeral = isEnum};
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[22,9,22,10,1],[26,13,26,130,1],[28,13,28,102,1],[29,9,29,10,1],[13,9,13,40,1]]);
+    </script>
+  </body>
+</html>

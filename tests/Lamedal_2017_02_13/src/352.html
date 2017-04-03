@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\excel\excel_worksheet.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Drawing;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.zPublicClass.ExcelData;
+using LamedalExcel;
+using LamedalExcel.Cells;
+using LamedalExcel.enums;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.Excel
+{
+    public sealed class Excel_WorkSheet
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance; // system library
+
+        /// &lt;summary&gt;Set the Cell value for the worksheet.&lt;/summary&gt;
+        /// &lt;param name=&quot;excelData&quot;&gt;The excel data.&lt;/param&gt;
+        /// &lt;param name=&quot;cellName&quot;&gt;The cell name&lt;/param&gt;
+        /// &lt;returns&gt;Cell&lt;/returns&gt;
+        public Cell WorkSheet_Cell(pcExcelData_ excelData, string cellName)
+        {
+            Worksheet sheet = Worksheet_FromExcelData(excelData);
+            Cell result = sheet.Cells[cellName];
+            return result;
+        }
+
+        /// &lt;summary&gt;Set the Cell value for the worksheet.&lt;/summary&gt;
+        /// &lt;param name=&quot;excelData&quot;&gt;The excel data.&lt;/param&gt;
+        /// &lt;param name=&quot;cellName&quot;&gt;Name of the cell.&lt;/param&gt;
+        /// &lt;param name=&quot;value&quot;&gt;The value.&lt;/param&gt;
+        /// &lt;param name=&quot;bold&quot;&gt;The bold.&lt;/param&gt;
+        /// &lt;param name=&quot;underline&quot;&gt;The underline.&lt;/param&gt;
+        /// &lt;param name=&quot;italic&quot;&gt;The italic.&lt;/param&gt;
+        /// &lt;param name=&quot;fontSize&quot;&gt;Size of the font.&lt;/param&gt;
+        /// &lt;param name=&quot;webLink&quot;&gt;The web link.&lt;/param&gt;
+        /// &lt;param name=&quot;textColor&quot;&gt;Color of the text.&lt;/param&gt;
+        /// &lt;param name=&quot;columnWidth&quot;&gt;Width of the column.&lt;/param&gt;
+        /// &lt;param name=&quot;fontName&quot;&gt;Name of the font.&lt;/param&gt;
+        /// &lt;param name=&quot;border&quot;&gt;The border.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public Cell WorkSheet_CellSet(pcExcelData_ excelData, string cellName, object value, bool? bold = null, bool? underline = null, 
+            bool? italic = null, int? fontSize = null, string webLink = null, Color? textColor = null, int? columnWidth = null, 
+            string fontName = null, enExcel_CellBorder? border = null)
+        {
+            Cell result = WorkSheet_Cell(excelData, cellName);
+            result.Value = value;
+            if (bold != null) result.Bold = (bool)bold;
+            if (underline != null) result.Underline = (bool)underline;
+            if (italic != null) result.Italic = (bool)italic;
+            if (fontSize != null) result.FontSize = (int)fontSize;
+            if (webLink != null) result.Hyperlink = webLink;
+            if (textColor != null) result.TextColor = (Color)textColor;
+            if (fontName != null) result.FontName = fontName;
+            if (columnWidth != null) WorkSheet_ColumnWidth(excelData, cellName, (int)columnWidth);
+            //if (border.HasValue)
+            if (border!=null)
+            {
+                int borderValue = (int)border.Value;
+                result.Border = (enCellBorder)borderValue;
+            }
+
+            return result;
+        }
+
+        /// &lt;summary&gt;Set the Cell value for the worksheet.&lt;/summary&gt;
+        /// &lt;param name=&quot;excelData&quot;&gt;The excel data.&lt;/param&gt;
+        /// &lt;param name=&quot;col&quot;&gt;The col.&lt;/param&gt;
+        /// &lt;param name=&quot;row&quot;&gt;The row.&lt;/param&gt;
+        /// &lt;param name=&quot;value&quot;&gt;The value.&lt;/param&gt;
+        /// &lt;param name=&quot;bold&quot;&gt;The bold.&lt;/param&gt;
+        /// &lt;param name=&quot;underline&quot;&gt;The underline.&lt;/param&gt;
+        /// &lt;param name=&quot;italic&quot;&gt;The italic.&lt;/param&gt;
+        /// &lt;param name=&quot;fontSize&quot;&gt;Size of the font.&lt;/param&gt;
+        /// &lt;param name=&quot;webLink&quot;&gt;The web link.&lt;/param&gt;
+        /// &lt;param name=&quot;textColor&quot;&gt;Color of the text.&lt;/param&gt;
+        /// &lt;param name=&quot;columnWidth&quot;&gt;Width of the column.&lt;/param&gt;
+        /// &lt;param name=&quot;fontName&quot;&gt;Name of the font.&lt;/param&gt;
+        /// &lt;param name=&quot;border&quot;&gt;The border.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public Cell WorkSheet_CellSet(pcExcelData_ excelData, int col, int row, object value, bool? bold = null, bool? underline = null, 
+            bool? italic = null, int? fontSize = null, string webLink = null, Color? textColor = null, int? columnWidth = null, 
+            string fontName = null, enExcel_CellBorder? border = null)
+        {
+            string cellRef = _lamed.lib.Excel.Adress.CellAddress(col, row);
+            return WorkSheet_CellSet(excelData, cellRef, value, bold,underline,italic,fontSize,webLink,textColor,columnWidth,fontName, border);
+        }
+
+        /// &lt;summary&gt;Set the column width of the sheet.&lt;/summary&gt;
+        /// &lt;param name=&quot;excelData&quot;&gt;The excel data.&lt;/param&gt;
+        /// &lt;param name=&quot;colNo&quot;&gt;The col no.&lt;/param&gt;
+        /// &lt;param name=&quot;colWidth&quot;&gt;Width of the col.&lt;/param&gt;
+        public void WorkSheet_ColumnWidth(pcExcelData_ excelData, int colNo, double colWidth)
+        {
+            var colName = _lamed.lib.Excel.Adress.ColName_FromColNumber(colNo);
+            WorkSheet_ColumnWidth(excelData, colName, colWidth);
+        }
+
+        /// &lt;summary&gt;Set the column width of the sheet.&lt;/summary&gt;
+        /// &lt;param name=&quot;excelData&quot;&gt;The excel data.&lt;/param&gt;
+        /// &lt;param name=&quot;colName&quot;&gt;Name of the col.&lt;/param&gt;
+        /// &lt;param name=&quot;colWidth&quot;&gt;Width of the col.&lt;/param&gt;
+        public void WorkSheet_ColumnWidth(pcExcelData_ excelData, string colName, double colWidth)
+        {
+            var sheet = Worksheet_FromExcelData(excelData);
+            var colNo = _lamed.lib.Excel.Adress.ColName_2Int(colName);
+            sheet.ColumnWidths[colNo - 1] = colWidth;
+        }
+
+        /// &lt;summary&gt;Creates a new Worksheet.&lt;/summary&gt;
+        /// &lt;param name=&quot;data&quot;&gt;The data.&lt;/param&gt;
+        /// &lt;param name=&quot;workbook&quot;&gt;The workbook.&lt;/param&gt;
+        /// &lt;param name=&quot;sheetName&quot;&gt;Name of the sheet.&lt;/param&gt;
+        /// &lt;param name=&quot;orientation&quot;&gt;The orientation.&lt;/param&gt;
+        internal void WorkSheet_New(pcExcelData_ data, Workbook workbook, string sheetName, enExcel_Orientation orientation = enExcel_Orientation.Portrait)
+        {
+            var sheet = new Worksheet(sheetName);
+            workbook.Add(sheet);
+
+            sheet.PageSetup.Orientation = (enOrientation)orientation;
+            sheet.PageSetup.PrintRepeatRows = 2;
+            sheet.PageSetup.PrintRepeatColumns = 2;
+            data._sheet = sheet;
+        }
+
+        /// &lt;summary&gt;Creates a new Worksheet.&lt;/summary&gt;
+        /// &lt;param name=&quot;data&quot;&gt;The data.&lt;/param&gt;
+        /// &lt;param name=&quot;sheetName&quot;&gt;Name of the sheet.&lt;/param&gt;
+        /// &lt;param name=&quot;workbookAuthor&quot;&gt;The workbook author.&lt;/param&gt;
+        /// &lt;param name=&quot;workbookTitle&quot;&gt;The workbook title.&lt;/param&gt;
+        /// &lt;param name=&quot;orientation&quot;&gt;The orientation.&lt;/param&gt;
+        public void WorkSheet_New(pcExcelData_ data, string sheetName, string workbookAuthor = &quot;&quot;, string workbookTitle = &quot;&quot;, enExcel_Orientation orientation = enExcel_Orientation.Portrait)
+        {
+            var workbook = Workbook_New(workbookAuthor, workbookTitle);
+            WorkSheet_New(data, workbook, sheetName, orientation);
+        }
+
+        /// &lt;summary&gt;Creates a new Workbook.&lt;/summary&gt;
+        /// &lt;param name=&quot;author&quot;&gt;The author.&lt;/param&gt;
+        /// &lt;param name=&quot;title&quot;&gt;The title.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        internal Workbook Workbook_New(string author = &quot;&quot;, string title = &quot;&quot;)
+        {
+            var workbook = new Workbook();
+            workbook.Title = title;
+            workbook.Author = author;
+            return workbook;
+        }
+
+        /// &lt;summary&gt;
+        /// Return the Worksheet for the excel data
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;excelData&quot;&gt;&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        private Worksheet Worksheet_FromExcelData(pcExcelData_ excelData)
+        {
+            var sheet = excelData.Worksheet;
+            if (sheet == null) &quot;Error! There is no worksheet in excelData.&quot;.zException_Show();  // Unit test needed for this
+            return sheet;
+        }
+
+        /// &lt;summary&gt;Saves the Workbook.&lt;/summary&gt;
+        /// &lt;param name=&quot;excelData&quot;&gt;The excel data.&lt;/param&gt;
+        /// &lt;param name=&quot;fileName&quot;&gt;Name of the file.&lt;/param&gt;
+        public void Workbook_Save(pcExcelData_ excelData, string fileName)
+        {
+            var sheet = Worksheet_FromExcelData(excelData);
+            sheet.Workbook.Save(fileName, CompressionLevel.Balanced);
+        }
+
+        /// &lt;summary&gt;Close the Workbook.&lt;/summary&gt;
+        /// &lt;param name=&quot;excelData&quot;&gt;The excel data.&lt;/param&gt;
+        public void Workbook_Close(pcExcelData_ excelData)
+        {
+            excelData._sheet = null;
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[24,9,24,10,1],[25,13,25,66,1],[26,13,26,49,1],[27,13,27,27,1],[28,9,28,10,1],[47,9,47,10,1],[48,13,48,63,1],[49,13,49,34,1],[50,13,50,30,1],[50,31,50,56,1],[51,13,51,35,1],[51,36,51,71,1],[52,13,52,32,1],[52,33,52,62,1],[53,13,53,34,1],[53,35,53,67,1],[54,13,54,33,1],[54,34,54,61,1],[55,13,55,35,1],[55,36,55,72,1],[56,13,56,34,1],[56,35,56,62,1],[57,13,57,37,1],[57,38,57,99,1],[59,13,59,30,1],[60,13,60,14,1],[61,17,61,53,1],[62,17,62,59,1],[63,13,63,14,1],[65,13,65,27,1],[66,9,66,10,1],[86,9,86,10,1],[87,13,87,76,1],[88,13,88,144,1],[89,9,89,10,1],[96,9,96,10,1],[97,13,97,80,1],[98,13,98,65,1],[99,9,99,10,1],[106,9,106,10,1],[107,13,107,60,1],[108,13,108,71,1],[109,13,109,54,1],[110,9,110,10,1],[118,9,118,10,1],[119,13,119,50,1],[120,13,120,33,1],[122,13,122,70,1],[123,13,123,49,1],[124,13,124,52,1],[125,13,125,33,1],[126,9,126,10,1],[135,9,135,10,1],[136,13,136,72,1],[137,13,137,67,1],[138,9,138,10,1],[145,9,145,10,1],[146,13,146,43,1],[147,13,147,36,1],[148,13,148,38,1],[149,13,149,29,1],[150,9,150,10,1],[158,9,158,10,1],[159,13,159,45,1],[160,13,160,31,1],[160,32,160,95,1],[161,13,161,26,1],[162,9,162,10,1],[168,9,168,10,1],[169,13,169,60,1],[170,13,170,70,1],[171,9,171,10,1],[176,9,176,10,1],[177,13,177,37,1],[178,9,178,10,1],[17,9,17,70,1]]);
+    </script>
+  </body>
+</html>

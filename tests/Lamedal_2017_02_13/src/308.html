@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classntbody\methodnt\methodntstats\methodntstats_.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT.MethodNTComment;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT.MethodNTHeader;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT.MethodNTstats
+{
+    [Serializable]
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_State)]
+    public sealed class MethodNTstats_
+    {
+        // Method Lines =======================
+        public int MethodTotalLines;
+        public int MethodTotalCommentLines;
+        public int MethodTotalBodyLines;
+
+        // Code =========================
+        /// &lt;summary&gt;The complexity of the given method body. The higher the count the more complex the method&lt;/summary&gt;
+        public int CodeComplexity;
+        public int CodeMaintainability;
+
+        // Other info
+        public List&lt;string&gt; ReferenceCalls;         // Reference calls of the method
+        public readonly List&lt;string&gt; SourceLines = new List&lt;string&gt;();            // Source lines of the method
+
+        [Test_IgnoreCoverage(enTestIgnore.MethodIsShortCut)]
+        public static MethodNTstats_ Create(List&lt;string&gt; sourceLines, ref int ii, MethodNT_ method)
+        {
+            return Create(sourceLines, ref ii, method.Comment, method.Header, method.Attribute_Lines.Count);
+        }
+
+        /// &lt;summary&gt;Creates the specified statistics for the source lines.&lt;/summary&gt;
+        /// &lt;param name=&quot;sourceLines&quot;&gt;The source lines.&lt;/param&gt;
+        /// &lt;param name=&quot;ii&quot;&gt;The ii.&lt;/param&gt;
+        /// &lt;param name=&quot;comments&quot;&gt;The comments.&lt;/param&gt;
+        /// &lt;param name=&quot;header&quot;&gt;The header.&lt;/param&gt;
+        /// &lt;param name=&quot;attributeLines&quot;&gt;The attribute lines.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public static MethodNTstats_ Create(List&lt;string&gt; sourceLines, ref int ii, MethodNTComment_ comments = null,  MethodNTHeader_ header = null, int attributeLines = 0)
+        {
+            var result = new MethodNTstats_(); // {Name = name, Value = value};
+            // Execute static method to populate result parameters
+            sourceLines.zTo_IList(result.SourceLines, true, ii);
+
+            // comments
+            var commentCount = 0;
+            if (comments != null)
+            {
+                commentCount = comments.CommentParameters.Count;
+                if (comments.CommentReturn != &quot;&quot;) commentCount++;
+                if (comments.CommentSummary != &quot;&quot;) commentCount++;
+            }
+            
+            result.MethodTotalCommentLines = commentCount;
+            result.MethodTotalLines = sourceLines.Count;
+            result.MethodTotalBodyLines = sourceLines.Count - commentCount - attributeLines - 3; // 3 = header + { + }
+            if (result.MethodTotalBodyLines &lt; 1) result.MethodTotalBodyLines = 1;
+
+            MethodNTstats_Methods.Method_Stats(result.SourceLines, out result.CodeComplexity, out result.CodeMaintainability,
+                        out result.ReferenceCalls, header);
+            return result;
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[60,50,60,82,0],[43,9,43,10,1],[44,13,44,47,1],[46,13,46,65,1],[49,13,49,34,1],[50,13,50,34,1],[51,13,51,14,1],[52,17,52,65,1],[53,17,53,50,1],[53,51,53,66,1],[54,17,54,51,1],[54,52,54,67,1],[55,13,55,14,1],[57,13,57,59,1],[58,13,58,57,1],[59,13,59,97,1],[60,13,60,49,1],[62,13,63,60,1],[64,13,64,27,1],[65,9,65,10,1],[27,9,27,71,1]]);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\types\class\class_attributes.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+
+namespace LamedalCore.Types.Class
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action, DefaultGroup = &quot;Attribute&quot;)]
+    public sealed class Class_Attributes
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance;
+
+        /// &lt;summary&gt;
+        /// Determines with reflection whether the custom attributes array has attribute .
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;customAttributes&quot;&gt;The custom attributes array&lt;/param&gt;
+        /// &lt;param name=&quot;filterForThisAttribute&quot;&gt;Return the attribute filtered for&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        private bool Find_&lt;TAttribute&gt;(Attribute[] customAttributes, out TAttribute filterForThisAttribute) where TAttribute : Attribute
+        {
+            filterForThisAttribute = _lamed.Types.Object.DefaultValue&lt;TAttribute&gt;();
+            foreach (Attribute attribute1 in customAttributes)
+            {
+                if (attribute1.GetType() == typeof(TAttribute))
+                {
+                    filterForThisAttribute = (TAttribute)attribute1;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// &lt;summary&gt;
+        /// Determines with reflectionwhether the member information has a specific attribute .
+        /// &lt;/summary&gt;
+        /// &lt;typeparam name=&quot;TFilterForThisAttribute&quot;&gt;The type of the filter to use to find this attribute.&lt;/typeparam&gt;
+        /// &lt;param name=&quot;memberInfo&quot;&gt;The member information&lt;/param&gt;
+        /// &lt;param name=&quot;attribute&quot;&gt;Return the attribute&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        private bool Find_MemberInfo&lt;TFilterForThisAttribute&gt;(MemberInfo memberInfo, out TFilterForThisAttribute attribute) where TFilterForThisAttribute : Attribute
+        {
+            Attribute[] attributes = memberInfo.GetCustomAttributes().ToArray();
+            return Find_(attributes, out attribute);
+        }
+
+        /// &lt;summary&gt;
+        /// Determines whether the class field type has attribute.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;The class type&lt;/param&gt;
+        /// &lt;param name=&quot;attribute&quot;&gt;The attribute reference variable&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        private bool Find_Field&lt;TFilterForThisAttribute&gt;(Type classType, out TFilterForThisAttribute attribute) where TFilterForThisAttribute : Attribute
+        {
+            // The attribute was not on the methods -&gt; test the fields
+            FieldInfo[] fields = _lamed.Types.Class.ClassInfo.Fields_AsFieldInfo(classType);
+            foreach (FieldInfo field in fields)
+            {
+                if (Find_MemberInfo(field, out attribute)) return true;
+            }
+            attribute = _lamed.Types.Object.DefaultValue&lt;TFilterForThisAttribute&gt;();
+            return false;
+        }
+
+        /// &lt;summary&gt;
+        /// Determines whether the class field type has attribute.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;The class type&lt;/param&gt;
+        /// &lt;param name=&quot;attribute&quot;&gt;The attribute reference variable&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        public bool Find_Class&lt;TFilterForThisAttribute&gt;(Type classType, out TFilterForThisAttribute attribute) where TFilterForThisAttribute : Attribute
+        {
+            // The attribute was not on the methods -&gt; test the fields
+            TypeInfo member = classType.GetTypeInfo();
+            if (Find_MemberInfo(member, out attribute)) return true;
+            attribute = _lamed.Types.Object.DefaultValue&lt;TFilterForThisAttribute&gt;();
+            return false;
+        }
+
+        /// &lt;summary&gt;Determines whether the class field type has attribute.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;TFilterForThisAttribute&quot;&gt;The type of the filter for this attribute.&lt;/typeparam&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;The class type&lt;/param&gt;
+        /// &lt;param name=&quot;returnAllFields&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [get all fields].&lt;/param&gt;
+        /// &lt;param name=&quot;returnPrivate&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [return private].&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public IList&lt;Tuple&lt;FieldInfo, TFilterForThisAttribute&gt;&gt; Find_Fields&lt;TFilterForThisAttribute&gt;(Type classType, bool returnAllFields = false, bool returnPrivate = false) 
+                    where TFilterForThisAttribute : Attribute
+        {
+            // The attribute was not on the methods -&gt; test the fields
+            var result = new List&lt;Tuple&lt;FieldInfo, TFilterForThisAttribute&gt;&gt;();
+            FieldInfo[] fields = _lamed.Types.Class.ClassInfo.Fields_AsFieldInfo(classType);
+            foreach (FieldInfo field in fields)   // FieldInfo -&gt; MemberInfo
+            {
+                TFilterForThisAttribute attribute;
+                if (Find_MemberInfo(field, out attribute)) result.Add(new Tuple&lt;FieldInfo, TFilterForThisAttribute&gt;(field, attribute));
+                else if (returnAllFields)
+                {
+                    if (returnPrivate) result.Add(new Tuple&lt;FieldInfo, TFilterForThisAttribute&gt;(field, null));
+                    else if (field.IsPrivate == false) result.Add(new Tuple&lt;FieldInfo, TFilterForThisAttribute&gt;(field, null));
+                }
+            }
+            return result;
+        }
+
+        /// &lt;summary&gt;Determines whether the class field type has attribute.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;TFilterForThisAttribute&quot;&gt;The type of the filter for this attribute.&lt;/typeparam&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;The class type&lt;/param&gt;
+        /// &lt;param name=&quot;returnAllMethods&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [get all fields].&lt;/param&gt;
+        /// &lt;param name=&quot;returnPrivate&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [return private].&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public IList&lt;Tuple&lt;MethodInfo, TFilterForThisAttribute&gt;&gt; Find_Methods&lt;TFilterForThisAttribute&gt;(Type classType, bool returnAllMethods = false, bool returnPrivate = false)
+                    where TFilterForThisAttribute : Attribute
+        {
+            // The attribute was not on the methods -&gt; test the fields
+            var result = new List&lt;Tuple&lt;MethodInfo, TFilterForThisAttribute&gt;&gt;();
+            MethodInfo[] methods = _lamed.Types.Class.ClassInfo.Methods_AsMethodInfo(classType);
+            foreach (MethodInfo method in methods)   // FieldInfo -&gt; MemberInfo
+            {
+                TFilterForThisAttribute attribute;
+                if (Find_MemberInfo(method, out attribute)) result.Add(new Tuple&lt;MethodInfo, TFilterForThisAttribute&gt;(method, attribute));
+                else if (returnAllMethods)
+                {
+                    if (returnPrivate) result.Add(new Tuple&lt;MethodInfo, TFilterForThisAttribute&gt;(method, null));
+                    else if (method.IsPrivate == false) result.Add(new Tuple&lt;MethodInfo, TFilterForThisAttribute&gt;(method, null));
+                }
+            }
+            return result;
+        }
+        /// &lt;summary&gt;
+        /// Determines whether the class method has attribute.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;The class type&lt;/param&gt;
+        /// &lt;param name=&quot;attribute&quot;&gt;The attribute reference variable&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        private bool Find_Method&lt;TFilterForThisAttribute&gt;(Type classType, out TFilterForThisAttribute attribute) where TFilterForThisAttribute : Attribute
+        {
+            // The attribute was not on the type -&gt; test the methods
+            IEnumerable&lt;MethodInfo&gt; methods = _lamed.Types.Class.ClassInfo.Methods_AsMethodInfo(classType);
+            foreach (MethodInfo method in methods)
+            {
+                if (Find_MemberInfo(method, out attribute)) return true;
+            }
+            attribute = _lamed.Types.Object.DefaultValue&lt;TFilterForThisAttribute&gt;();
+            return false;
+        }
+
+        /// &lt;summary&gt;Determines whether the class constructor has attribute.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;TfilterForThisAttribute&quot;&gt;The type of the filter for this attribute.&lt;/typeparam&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;The class type&lt;/param&gt;
+        /// &lt;param name=&quot;attribute&quot;&gt;The attribute reference variable&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        public bool Find_Constructor&lt;TfilterForThisAttribute&gt;(Type classType, out TfilterForThisAttribute attribute) where TfilterForThisAttribute : Attribute
+        {
+            // The attribute was not on the type -&gt; test the methods
+            ConstructorInfo[] constructors = _lamed.Types.Class.ClassInfo.Constructors_AsConstructorInfo(classType);
+            foreach (ConstructorInfo constructor in constructors)
+            {
+                if (Find_MemberInfo(constructor, out attribute)) return true;
+            }
+            attribute = _lamed.Types.Object.DefaultValue&lt;TfilterForThisAttribute&gt;();
+            return false;
+        }
+
+        /// &lt;summary&gt;
+        /// Determines with reflection whether the type has a specific attribute  type.
+        /// &lt;/summary&gt;
+        /// &lt;typeparam name=&quot;TfilterForThisAttribute&quot;&gt;The type of the filter for this attribute.&lt;/typeparam&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;Type of the class.&lt;/param&gt;
+        /// &lt;param name=&quot;attribute&quot;&gt;Return the attribute&lt;/param&gt;
+        /// &lt;returns&gt;eAttributeLocation&lt;/returns&gt;
+        public enAttributeLocation Find_ForType&lt;TfilterForThisAttribute&gt;(Type classType, out TfilterForThisAttribute attribute) where TfilterForThisAttribute : Attribute
+        {
+            if (Find_MemberInfo(classType.GetTypeInfo(), out attribute)) return enAttributeLocation.Class;
+
+            // The attribute was not on the type -&gt; test the methods
+            if (Find_Method(classType, out attribute)) return enAttributeLocation.Method;
+
+            if (Find_Field(classType, out attribute)) return enAttributeLocation.Field;
+
+            // The attribute was not on the fields -&gt; test the properties
+            if (Find_Property(classType, out attribute)) return enAttributeLocation.Property;
+
+            // The attribute was not on the constructor -&gt; test the properties
+            if (Find_Constructor(classType, out attribute)) return enAttributeLocation.Constructor;
+
+            return enAttributeLocation.None;
+        }
+
+        /// &lt;summary&gt;Determines whether the class property has attribute.&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;TfilterForThisAttribute&quot;&gt;The type of the filter for this attribute.&lt;/typeparam&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;The class type&lt;/param&gt;
+        /// &lt;param name=&quot;attribute&quot;&gt;The attribute reference variable&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        private bool Find_Property&lt;TfilterForThisAttribute&gt;(Type classType, out TfilterForThisAttribute attribute) where TfilterForThisAttribute : Attribute
+        {
+            // The attribute was not on the fields -&gt; test the properties
+            PropertyInfo[] properties = _lamed.Types.Class.ClassInfo.Properties_AsPropertyInfo(classType);
+            foreach (PropertyInfo property in properties)
+            {
+                if (Find_MemberInfo(property, out attribute)) return true;
+            }
+            attribute = _lamed.Types.Object.DefaultValue&lt;TfilterForThisAttribute&gt;();
+            return false;
+        }
+
+        /// &lt;summary&gt;Return all the class properties with this attribute .&lt;/summary&gt;
+        /// &lt;typeparam name=&quot;TfilterForThisAttribute&quot;&gt;The type of the filter for this attribute.&lt;/typeparam&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;The class type&lt;/param&gt;
+        /// &lt;param name=&quot;returnAllFields&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [return all fields].&lt;/param&gt;
+        /// &lt;param name=&quot;returnPrivate&quot;&gt;if set to &lt;c&gt;true&lt;/c&gt; [return private].&lt;/param&gt;
+        /// &lt;returns&gt;bool&lt;/returns&gt;
+        public IList&lt;Tuple&lt;PropertyInfo,TfilterForThisAttribute&gt;&gt; Find_Properties&lt;TfilterForThisAttribute&gt;(Type classType, bool returnAllFields = false,bool returnPrivate = false) where TfilterForThisAttribute : Attribute
+        {
+            // The attribute was not on the fields -&gt; test the properties
+            var result = new List&lt;Tuple&lt;PropertyInfo,TfilterForThisAttribute&gt;&gt;();
+            PropertyInfo[] properties = _lamed.Types.Class.ClassInfo.Properties_AsPropertyInfo(classType);
+            foreach (PropertyInfo property in properties)
+            {
+                TfilterForThisAttribute attribute;
+                if (Find_MemberInfo(property, out attribute)) result.Add(new Tuple&lt;PropertyInfo, TfilterForThisAttribute&gt;(property, attribute));
+                else if (returnAllFields)
+                {
+                    if (returnPrivate) result.Add(new Tuple&lt;PropertyInfo, TfilterForThisAttribute&gt;(property, null));
+                    else if (property.GetSetMethod() != null) result.Add(new Tuple&lt;PropertyInfo, TfilterForThisAttribute&gt;(property, null));
+                }
+            }
+            return result;
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[22,9,22,10,1],[23,13,23,85,1],[24,13,24,20,1],[24,46,24,62,1],[24,22,24,42,1],[25,13,25,14,1],[26,17,26,64,1],[27,17,27,18,1],[28,21,28,69,1],[29,21,29,33,1],[31,13,31,14,1],[24,43,24,45,1],[32,13,32,26,1],[33,9,33,10,1],[43,9,43,10,1],[44,13,44,81,1],[45,13,45,53,1],[46,9,46,10,1],[55,9,55,10,1],[57,13,57,93,1],[58,13,58,20,1],[58,41,58,47,1],[58,22,58,37,1],[59,13,59,14,1],[60,17,60,59,1],[60,60,60,72,1],[61,13,61,14,1],[58,38,58,40,1],[62,13,62,85,1],[63,13,63,26,1],[64,9,64,10,1],[73,9,73,10,1],[75,13,75,55,1],[76,13,76,56,1],[76,57,76,69,1],[77,13,77,85,1],[78,13,78,26,1],[79,9,79,10,1],[89,9,89,10,1],[91,13,91,80,1],[92,13,92,93,1],[93,13,93,20,1],[93,41,93,47,1],[93,22,93,37,1],[94,13,94,14,1],[96,17,96,59,1],[96,60,96,136,1],[97,22,97,42,1],[98,17,98,18,1],[99,21,99,39,1],[99,40,99,111,1],[100,26,100,55,1],[100,56,100,127,1],[101,17,101,18,1],[102,13,102,14,1],[93,38,93,40,1],[103,13,103,27,1],[104,9,104,10,1],[114,9,114,10,1],[116,13,116,81,1],[117,13,117,97,1],[118,13,118,20,1],[118,43,118,50,1],[118,22,118,39,1],[119,13,119,14,1],[121,17,121,60,1],[121,61,121,139,1],[122,22,122,43,1],[123,17,123,18,1],[124,21,124,39,1],[124,40,124,113,1],[125,26,125,56,1],[125,57,125,130,1],[126,17,126,18,1],[127,13,127,14,1],[118,40,118,42,1],[128,13,128,27,1],[129,9,129,10,1],[137,9,137,10,1],[139,13,139,108,1],[140,13,140,20,1],[140,43,140,50,1],[140,22,140,39,1],[141,13,141,14,1],[142,17,142,60,1],[142,61,142,73,1],[143,13,143,14,1],[140,40,140,42,1],[144,13,144,85,1],[145,13,145,26,1],[146,9,146,10,1],[154,9,154,10,1],[156,13,156,117,1],[157,13,157,20,1],[157,53,157,65,1],[157,22,157,49,1],[158,13,158,14,1],[159,17,159,65,1],[159,66,159,78,1],[160,13,160,14,1],[157,50,157,52,1],[161,13,161,85,1],[162,13,162,26,1],[163,9,163,10,1],[173,9,173,10,1],[174,13,174,73,1],[174,74,174,107,1],[177,13,177,55,1],[177,56,177,90,1],[179,13,179,54,1],[179,55,179,88,1],[182,13,182,57,1],[182,58,182,94,1],[185,13,185,60,1],[185,61,185,100,1],[187,13,187,45,1],[188,9,188,10,1],[196,9,196,10,1],[198,13,198,107,1],[199,13,199,20,1],[199,47,199,57,1],[199,22,199,43,1],[200,13,200,14,1],[201,17,201,62,1],[201,63,201,75,1],[202,13,202,14,1],[199,44,199,46,1],[203,13,203,85,1],[204,13,204,26,1],[205,9,205,10,1],[214,9,214,10,1],[216,13,216,82,1],[217,13,217,107,1],[218,13,218,20,1],[218,47,218,57,1],[218,22,218,43,1],[219,13,219,14,1],[221,17,221,62,1],[221,63,221,145,1],[222,22,222,42,1],[223,17,223,18,1],[224,21,224,39,1],[224,40,224,117,1],[225,26,225,62,1],[225,63,225,140,1],[226,17,226,18,1],[227,13,227,14,1],[218,44,218,46,1],[228,13,228,27,1],[229,9,229,10,1],[13,9,13,70,1]]);
+    </script>
+  </body>
+</html>

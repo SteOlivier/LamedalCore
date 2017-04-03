@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\types\class\class_info_dictionary.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.zz;
+
+namespace LamedalCore.Types.Class
+
+{
+    /// &lt;summary&gt;
+    /// This class is used internally to optimise reflection opperations
+    /// &lt;/summary&gt;
+    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action)]
+    internal sealed class Class_Info_Dictionary
+    {
+        //private readonly LaMedal.Portable.Types.Types_ _types = LaMedal.Portable.LaMedalPortable.Instance.Types;
+
+        // Caching of reflection items in order to speedup usage.
+        #region Dictionary fields
+
+        //Blueprint_Attributes
+        /// &lt;summary&gt;ConstructorInfo quick reference.&lt;/summary&gt;
+        private static readonly Dictionary&lt;Type, Blueprint_Attributes&gt; _blueprintAttributes = new Dictionary&lt;Type, Blueprint_Attributes&gt;();
+
+        /// &lt;summary&gt;ConstructorInfo quick reference.&lt;/summary&gt;
+        private static readonly Dictionary&lt;Type, ConstructorInfo[]&gt; _constructorInfos = new Dictionary&lt;Type, ConstructorInfo[]&gt;();
+
+        /// &lt;summary&gt;MethodInfo quick reference.&lt;/summary&gt;
+        private static readonly Dictionary&lt;Type, MethodInfo[]&gt; _methodInfos = new Dictionary&lt;Type, MethodInfo[]&gt;();
+
+        /// &lt;summary&gt;FieldInfo quick reference.&lt;/summary&gt;
+        private readonly Dictionary&lt;Type, FieldInfo[]&gt; _fieldInfo = new Dictionary&lt;Type, FieldInfo[]&gt;();
+
+        /// &lt;summary&gt;PropertyInfo quick reference.&lt;/summary&gt;
+        private readonly Dictionary&lt;Type, PropertyInfo[]&gt; _propertyInfos = new Dictionary&lt;Type, PropertyInfo[]&gt;();
+
+        #endregion
+
+        private BindingFlags _bindingAttributes = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+
+        //private BindingFlags BindingFlagsSetup(bool addBase = true, bool addPublic = true, bool addNonPublic = true)
+        //{
+        //    var flags = BindingFlags.Static;
+        //    if (addPublic) flags = flags | BindingFlags.Public;
+        //    if (addNonPublic) flags = flags | BindingFlags.NonPublic;
+        //    if (addBase) flags = flags | BindingFlags.Instance;
+        //    return flags;
+        //}
+
+        /// &lt;summary&gt;
+        /// Generic blueprint rule and data caching.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;The class type&lt;/param&gt;
+        /// &lt;returns&gt;FieldInfo[]&lt;/returns&gt;
+        public Blueprint_Attributes Blueprint_Attributes(Type classType)
+        {
+            if (_blueprintAttributes.ContainsKey(classType)) return _blueprintAttributes[classType];
+
+            // Add classType to the quick reference list
+            var blueprint = new Blueprint_Attributes(classType);
+            _blueprintAttributes.Add(classType, blueprint);
+            return blueprint;
+        }
+
+        #region ConstructorInfo
+        /// &lt;summary&gt;
+        /// Get the cached methods for a type
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public ConstructorInfo[] ConstructorInfo_Get(Type classType)
+        {
+            if (_constructorInfos.ContainsKey(classType)) return _constructorInfos[classType];
+
+            ConstructorInfo[] constructorInfos = classType.GetTypeInfo().GetConstructors(_bindingAttributes);
+            _constructorInfos.Add(classType, constructorInfos);
+            return constructorInfos;
+        }
+
+        public ConstructorInfo ConstructorInfo_Get(Type classType, string constructorName)
+        {
+            return ConstructorInfo_Get(classType).FirstOrDefault(m =&gt; m.DeclaringType.Name == constructorName);
+        }
+        #endregion
+
+        #region FieldInfo
+        /// &lt;summary&gt;
+        /// Generic field information for the type.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;The class type&lt;/param&gt;
+        /// &lt;returns&gt;FieldInfo[]&lt;/returns&gt;
+        public FieldInfo[] FieldInfo_Get(Type classType)
+        {
+            if (_fieldInfo.ContainsKey(classType)) return _fieldInfo[classType];
+
+            // Add classType to the quick reference list
+            TypeInfo typeInfo = classType.GetTypeInfo();
+            FieldInfo[] fieldInfos = typeInfo.GetFields(_bindingAttributes);
+            _fieldInfo.Add(classType, fieldInfos);
+
+            //// Add base types
+            //Type baseType = classType.BaseType; // Get the first parent
+            //if (baseType != null) FieldInfo_Get(baseType);
+
+            return fieldInfos;
+        }
+
+        public FieldInfo FieldInfo_Get(Type classType, string fieldName)
+        {
+            var result = FieldInfo_Get(classType).FirstOrDefault(m =&gt; m.Name == fieldName);
+            if (result != null) return result;
+
+            // Search the base types for the property
+            Type baseType = classType.GetTypeInfo().BaseType; // Get the first parent
+            if (baseType != null) result = FieldInfo_Get(baseType, fieldName);
+
+            return result;
+        }
+        #endregion
+
+        #region MethodInfo
+        /// &lt;summary&gt;
+        /// Get a method by name
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;&lt;/param&gt;
+        /// &lt;param name=&quot;methodName&quot;&gt;&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public MethodInfo MethodInfo_Get(Type classType, string methodName)
+        {
+            return MethodInfo_Get(classType).FirstOrDefault(m =&gt; m.Name == methodName);
+        }
+
+        /// &lt;summary&gt;
+        /// Get the cached methods for a type
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public MethodInfo[] MethodInfo_Get(Type classType)
+        {
+            if (_methodInfos.ContainsKey(classType)) return _methodInfos[classType];
+
+            var methodInfos = classType.GetTypeInfo().GetMethods(_bindingAttributes);
+            List&lt;MethodInfo&gt; list = new List&lt;MethodInfo&gt;();
+            foreach (var method in methodInfos)
+            {
+                if (method.Name.zIn(&quot;Equals&quot;, &quot;GetHashCode&quot;, &quot;GetType&quot;, &quot;Finalize&quot;, &quot;MemberwiseClone&quot;, &quot;ToString&quot;)) continue;
+                if (method.IsSpecialName == false) list.Add(method);
+            }
+            methodInfos = list.ToArray();  // Remove geters and setters
+
+            _methodInfos.Add(classType, methodInfos);
+            return methodInfos;
+        }
+        #endregion
+
+        #region PropertyInfo
+        /// &lt;summary&gt;
+        /// Generic properties for the type.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;The class type&lt;/param&gt;
+        /// &lt;returns&gt;PropertyInfo[]&lt;/returns&gt;
+        public PropertyInfo[] PropertyInfo_Get(Type classType)
+        {
+            if (_propertyInfos.ContainsKey(classType)) return _propertyInfos[classType];
+
+            // Add classType to the quick reference list
+            TypeInfo classTypeInfo = classType.GetTypeInfo();
+            PropertyInfo[] propertyInfos = classTypeInfo.GetProperties(_bindingAttributes);
+            _propertyInfos.Add(classType, propertyInfos);
+
+            //// Add base types
+            //Type baseType = classType.BaseType; // Get the first parent
+            //if (baseType != null) PropertyInfo_Get(baseType);
+
+            return propertyInfos;
+        }
+
+        /// &lt;summary&gt;
+        /// Get a method by name
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;classType&quot;&gt;&lt;/param&gt;
+        /// &lt;param name=&quot;propertyName&quot;&gt;&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public PropertyInfo PropertyInfo_Get(Type classType, string propertyName)
+        {
+            PropertyInfo result = PropertyInfo_Get(classType).FirstOrDefault(m =&gt; m.Name == propertyName);
+            if (result != null) return result;
+
+            // Search the base types for the property
+            Type baseType = classType.GetTypeInfo().BaseType; // Get the first parent
+            if (baseType != null) result = PropertyInfo_Get(baseType, propertyName);
+
+            return result;
+        }
+        #endregion
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[58,9,58,10,1],[59,13,59,61,1],[59,62,59,101,1],[62,13,62,65,1],[63,13,63,60,1],[64,13,64,30,1],[65,9,65,10,1],[74,9,74,10,1],[75,13,75,58,1],[75,59,75,95,1],[77,13,77,110,1],[78,13,78,64,1],[79,13,79,37,1],[80,9,80,10,1],[83,9,83,10,1],[84,13,84,71,1],[84,110,84,112,1],[85,9,85,10,1],[95,9,95,10,1],[96,13,96,51,1],[96,52,96,81,1],[99,13,99,57,1],[100,13,100,77,1],[101,13,101,51,1],[107,13,107,31,1],[108,9,108,10,1],[111,9,111,10,1],[112,13,112,71,1],[112,90,112,92,1],[113,13,113,32,1],[113,33,113,47,1],[116,13,116,62,1],[117,13,117,34,1],[117,35,117,79,1],[119,13,119,27,1],[120,9,120,10,1],[131,9,131,10,1],[132,13,132,66,1],[132,86,132,88,1],[133,9,133,10,1],[141,9,141,10,1],[142,13,142,53,1],[142,54,142,85,1],[144,13,144,86,1],[145,13,145,60,1],[146,13,146,20,1],[146,36,146,47,1],[146,22,146,32,1],[147,13,147,14,1],[148,17,148,116,1],[148,117,148,126,1],[149,17,149,51,1],[149,52,149,69,1],[150,13,150,14,1],[146,33,146,35,1],[151,13,151,42,1],[153,13,153,54,1],[154,13,154,32,1],[155,9,155,10,1],[165,9,165,10,1],[166,13,166,55,1],[166,56,166,89,1],[169,13,169,62,1],[170,13,170,92,1],[171,13,171,58,1],[177,13,177,34,1],[178,9,178,10,1],[187,9,187,10,1],[188,13,188,83,1],[188,105,188,107,1],[189,13,189,32,1],[189,33,189,47,1],[192,13,192,62,1],[193,13,193,34,1],[193,35,193,85,1],[195,13,195,27,1],[196,9,196,10,1],[34,9,34,105,1],[37,9,37,115,1],[41,9,41,142,1],[25,9,25,140,1],[28,9,28,131,1],[31,9,31,116,1],[84,71,84,110,1],[112,71,112,90,1],[132,66,132,86,1],[188,83,188,105,1]]);
+    </script>
+  </body>
+</html>

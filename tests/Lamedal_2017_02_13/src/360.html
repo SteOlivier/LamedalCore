@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\domain\attributes\blueprintrule_classattribute.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using LamedalCore.domain.Enumerals;
+
+namespace LamedalCore.domain.Attributes
+{
+    [AttributeUsage(AttributeTargets.Class)]
+    public class BlueprintRule_ClassAttribute : Attribute
+    {
+        public enBlueprintClassNetworkType ClassType;
+        public string DefaultGroup = &quot;&quot;;     // If the mehtod is of the default type -&gt; use this default group. Usually it should be empty
+        public Type DefaultType;      // If a method first parameter is the default type, the default type will be part of the method name
+        public string GroupName = &quot;&quot;;        // The default value for the groupname will be the classname. This override the default classname as the group
+        public bool IgnoreGroup;        // The classname will be ignored in transformations 
+        public bool IgnoreGroupPath;    // The classname will be remomved from the method name (if it exists) in transformations
+        public bool IncludeObjects;     // Object methods will be included in transformations
+
+        // Ignore Namespaces
+        public string Ignore_Namespace1 = &quot;domain&quot;;         // Namespaces to ignore like Factory and zz
+        public string Ignore_Namespace2 = &quot;parts&quot;;         // Ignore no 2
+        public string Ignore_Namespace3;
+        public string Ignore_Namespace4;
+
+        //// Commen Shortcut classes can be directed to other shortcut class
+        //public string ShortcutClass_String;     // &lt;code ShortcutClass_String =&quot;String_Shortcut&quot;&gt;&lt;/code&gt; 
+        //public string ShortcutClass_Object;     // &lt;code ShortcutClass_Object =&quot;String_Object&quot;&gt;&lt;/code&gt; 
+        public string ShortcutClass;            // &lt;code ShortcutClass =&quot;Enum_Shortcut&quot;&gt;&lt;/code&gt;  // Override default method filter behavior -&gt; move this method to the Enums_Shortcut class
+
+        public BlueprintRule_ClassAttribute(enBlueprintClassNetworkType classType)
+        {
+            ClassType = classType;
+        }
+
+        private BlueprintRule_ClassAttribute()
+        {
+            // Only available in inherited class
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[10,9,10,41,1],[12,9,12,38,1],[18,9,18,52,1],[19,9,19,51,1],[33,9,33,47,0],[34,9,34,10,0],[36,9,36,10,0],[28,9,28,83,1],[29,9,29,10,1],[30,13,30,35,1],[31,9,31,10,1]]);
+    </script>
+  </body>
+</html>

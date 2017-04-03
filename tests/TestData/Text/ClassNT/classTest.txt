@@ -1,0 +1,166 @@
+{
+  "ClassName": "Types_Money",
+  "ClassFileName": "",
+  "BlueprintRule": {
+    "ClassType": 2,
+    "DefaultGroup": null,
+    "DefaultType": null,
+    "GroupName": null,
+    "IgnoreGroup": false,
+    "IgnoreGroupPath": false,
+    "IncludeObjects": false,
+    "Ignore_Namespace1": null,
+    "Ignore_Namespace2": null,
+    "Ignore_Namespace3": null,
+    "Ignore_Namespace4": null,
+    "ShortcutClass": null,
+    "TypeId": "LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttribute.ClassNTBlueprintRule.ClassNTBlueprintRule_, LamedalCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+  },
+  "Header": {
+    "NameSpace_Name": "Blueprint.lib.Rules.Types",
+    "NameSpace_UsingLines": [
+      "System"
+    ],
+    "NameSpace_AttributeLines": [
+      "[BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action)]"
+    ],
+    "Namespace_Attributes": {
+      "Items": [
+        {
+          "AttributeName": "BlueprintRule_Class",
+          "Parameters": [
+            {
+              "Name": "BlueprintRule_Class",
+              "Value": "enBlueprintClassNetworkType.Node_Action",
+              "IsEnumeral": true
+            }
+          ]
+        }
+      ]
+    },
+    "ClassName": "Types_Money",
+    "ClassName_ShortVersion": "Money",
+    "ClassName_Group": "Types",
+    "ClassName1": "Types",
+    "ClassName2": "Money",
+    "Header_Comment": "Money convertions",
+    "Header_CommentLines": [
+      "<summary>Money convertions</summary>"
+    ],
+    "Header_ClassScope": "public",
+    "Header_ClassKind": "sealed",
+    "Header_ClassBase": ""
+  },
+  "Methods": [
+    {
+      "MethodName": "ToMoney",
+      "Comment": {
+        "CommentSummary": "A Double extension method that converts the @this to a money.",
+        "CommentReturn": "@this as a Double.",
+        "CommentParameters": [
+          {
+            "ParameterName": "this",
+            "ParameterComment": "The @this to act on."
+          }
+        ]
+      },
+      "Attribute_Lines": [],
+      "Attribute_Breakdown": {
+        "Items": []
+      },
+      "Attribute_Rule": null,
+      "Attribute_Alias": null,
+      "Header": {
+        "Header_Scope": 1,
+        "Header_Kind": 16,
+        "Header_ReturnType": "Double",
+        "Header_Name": "ToMoney",
+        "Header_Specialty": 1,
+        "Header_Parameters": [
+          {
+            "ParmeterIsThis": false,
+            "ParameterRefType": 0,
+            "ParameterTypeName": "Double",
+            "ParameterName": "@this",
+            "ParameterValue": null,
+            "ParameterSourceLine": "Double @this",
+            "ParameterComment": "The @this to act on."
+          }
+        ],
+        "Method_HeaderLine": "public Double ToMoney(Double @this)",
+        "Method_Signature": "ToMoney(Double) : Double",
+        "Method_ParametersLine": "Double @this"
+      },
+      "Statistics": {
+        "MethodTotalLines": 9,
+        "MethodTotalCommentLines": 3,
+        "MethodTotalBodyLines": 3,
+        "CodeComplexity": 1,
+        "CodeMaintainability": 0,
+        "ReferenceCalls": [],
+        "SourceLines": [
+          "        public Double ToMoney(Double @this)",
+          "        {",
+          "            return Math.Round(@this, 2);",
+          "        }"
+        ]
+      },
+      "ParentClassName": null,
+      "SourceCode": [
+        "        /// <summary>",
+        "        ///     A Double extension method that converts the @this to a money.",
+        "        /// </summary>",
+        "        /// <param name=\"this\">The @this to act on.</param>",
+        "        /// <returns>@this as a Double.</returns>",
+        "        public Double ToMoney(Double @this)",
+        "        {",
+        "            return Math.Round(@this, 2);",
+        "        }"
+      ]
+    }
+  ],
+  "Properties": [],
+  "Statistics": {
+    "ClassTotalLines": 31,
+    "ClassTotalBlankLines": 1,
+    "ClassTotalCommentLines": 6,
+    "ClassTotalCodeLines": 4,
+    "TotalAttributes": 1,
+    "TotalMethods": 1,
+    "TotalMethods_Public": 1,
+    "TotalMethods_Static": 0,
+    "TotalFields": 0,
+    "TotalProperties": 0,
+    "TotalEnumerals": 0,
+    "MethodTotalLines": 9,
+    "MethodTotalBodyLines": 3,
+    "MethodMaxLines": 3,
+    "MethodAvgLines": 3,
+    "CodeMaintainability": 0,
+    "CodeComplexity": 1
+  },
+  "SourceCode": [
+    "using System;",
+    "",
+    "namespace Blueprint.lib.Rules.Types",
+    "{",
+    "    /// <summary>",
+    "    /// Money convertions",
+    "    /// </summary>",
+    "    [BlueprintRule_Class(enBlueprintClassNetworkType.Node_Action)]",
+    "    public sealed class Types_Money",
+    "    {",
+    "        /// <summary>",
+    "        ///     A Double extension method that converts the @this to a money.",
+    "        /// </summary>",
+    "        /// <param name=\"this\">The @this to act on.</param>",
+    "        /// <returns>@this as a Double.</returns>",
+    "        public Double ToMoney(Double @this)",
+    "        {",
+    "            return Math.Round(@this, 2);",
+    "        }",
+    "    }",
+    "}",
+    ""
+  ]
+}

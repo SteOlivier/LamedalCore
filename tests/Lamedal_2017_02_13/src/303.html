@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\solutionnt\classnt\classntheader\classntheader_methods.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System.Collections.Generic;
+using LamedalCore.domain.Attributes;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTBody.MethodNT.MethodNTComment;
+using LamedalCore.lib.SolutionNT.ClassNT.ClassNTStats;
+using LamedalCore.zz;
+
+namespace LamedalCore.lib.SolutionNT.ClassNT.ClassNTHeader
+{
+    [BlueprintRule_Class(enBlueprintClassNetworkType.VS_Static)]
+    public static class ClassNTHeader_Methods
+    {
+        /// &lt;summary&gt;
+        /// Setups the ClassHeader_ class.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;sourceLines&quot;&gt;The source lines list&lt;/param&gt;
+        /// &lt;param name=&quot;ii&quot;&gt;The ii indexer reference variable&lt;/param&gt;
+        /// &lt;param name=&quot;statistics&quot;&gt;The class source statistics&lt;/param&gt;
+        /// &lt;param name=&quot;Using&quot;&gt;The using.&lt;/param&gt;
+        /// &lt;param name=&quot;attributes&quot;&gt;The attributes.&lt;/param&gt;
+        /// &lt;param name=&quot;nameSpace&quot;&gt;The name space.&lt;/param&gt;
+        /// &lt;param name=&quot;commentSummary&quot;&gt;The comment summary.&lt;/param&gt;
+        /// &lt;param name=&quot;commentLines&quot;&gt;The comment lines.&lt;/param&gt;
+        public static bool Parse_ClassHeader(List&lt;string&gt; sourceLines, out int ii, ClassNTStats_ statistics, out List&lt;string&gt; Using, out List&lt;string&gt; attributes, out string nameSpace,
+            out string commentSummary, out List&lt;string&gt; commentLines)
+        {
+            // Set initial parameters
+            // ==========================
+            var lamed = LamedalCore_.Instance;  // Create new instance of the blueprint library
+            nameSpace = &quot;&quot;;
+            Using = new List&lt;string&gt;();
+            attributes = new List&lt;string&gt;();
+            string ctiCodeLine = &quot;&quot;;
+            commentSummary = null;
+            commentLines = null;
+
+            ii = 0;
+            bool classHelp = false;
+            // Header =========================
+            for (; ii &lt; sourceLines.Count; ii++)
+            {
+                string line = sourceLines[ii];
+                if (statistics.zParse_IsBlankLine(line)) continue; // &lt;--------------------------------------------------
+
+                // using
+                if (line.Contains(&quot;using &quot;))
+                {
+                    string using1 = line.zvar_Value(&quot;using &quot;).zSubStr_RemoveStrAtEnd(&quot;;&quot;);
+                    Using.Add(using1);
+                    //statistics.ClassTotalCodeLines++;
+                    continue;
+                }
+
+                // namespace
+                if (line.Contains(&quot;namespace &quot;))
+                {
+                    nameSpace = lamed.Types.String.Search.Var_Value(line, &quot;namespace &quot;);
+                    classHelp = true;
+                }
+
+                #region -[Help &amp; Attributes
+                // Lines here may contain help (between &#39;namespace&#39; and &#39;class&#39;) 
+                /*
+                /// &lt;summary&gt;
+                /// Class Table_Key. This class cannot be inherited. |Key|
+                /// &lt;/summary&gt;
+                 */
+                if (classHelp &amp;&amp; line.Contains(&quot;/// &quot;) || (line.Contains(&quot;[&quot;) &amp;&amp; line.Contains(&quot;//&quot;) == false))
+                {
+                    int iiSave = ii;
+                    string returnLine;
+                    MethodNTComment_Methods.Documentation_Parts(sourceLines, ref ii, statistics, out commentLines, out commentSummary, out attributes, out returnLine, out ctiCodeLine);
+                    line = sourceLines[ii];
+                }
+
+                #endregion
+
+                // Class header line definition ===============================&gt; 
+                if (line.Contains(&quot; class &quot;) &amp;&amp; line.zContains_Any(&quot;/// &quot;, &quot;// &quot;) == false) return true;
+
+                
+            }
+            return false;
+        }
+
+        public static void Parse_ClassDefinition(string line, string nameSpace, out string classKind, out string classScope, out string className,
+            out string classBase, out string classnameGroup, out string classNameShortVersion)
+        {
+            classKind = null;
+            classScope = null;
+            className = null;
+            classBase = null;
+            classnameGroup = null;
+            classNameShortVersion = null;
+            if (line.Contains(&quot; class &quot;) == false || line.zContains_Any(&quot;/// &quot;, &quot;// &quot;)) return;
+
+            classKind = line.zvar_Id(&quot; class &quot;);
+            classScope = &quot; &quot;.zVar_Next(ref classKind);
+            classBase = line.zvar_Value(&quot; class &quot;);
+            className = &quot;:&quot;.zVar_Next(ref classBase).Trim();
+            classBase = classBase.Trim();
+            classnameGroup = LamedalCore_.Instance.Types.String.Word.Word_Last(nameSpace, &quot;.&quot;);
+            classNameShortVersion = className.Replace(classnameGroup, &quot;&quot;);
+            classNameShortVersion = classNameShortVersion.Replace(&quot;_&quot;, &quot;&quot;);
+
+            // CTIN
+            //if (ctiCodeLine.zIsNullOrEmpty() == false) _CTIN = new sourceClassHeader_CTIN(Class_Name, ctiCodeLine);
+
+            return;  // &lt;=======================================================
+        }
+
+        /// &lt;summary&gt;
+        /// Class name breakdown.
+        /// &lt;/summary&gt;
+        /// &lt;param name=&quot;className&quot;&gt;The class name&lt;/param&gt;
+        /// &lt;param name=&quot;ClassName1&quot;&gt;Return the class name1&lt;/param&gt;
+        /// &lt;param name=&quot;ClassName2&quot;&gt;Return the class name2&lt;/param&gt;
+        public static void ClassNameBreakdown(string className, out string ClassName1, out string ClassName2)
+        {
+            ClassName1 = className.zvar_Id(&quot;_&quot;);
+            ClassName2 = className.zvar_Value(&quot;_&quot;);
+        }
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[95,89,95,96,0],[26,9,26,10,1],[29,13,29,47,1],[30,13,30,28,1],[31,13,31,40,1],[32,13,32,45,1],[33,13,33,37,1],[34,13,34,35,1],[35,13,35,33,1],[37,13,37,20,1],[38,13,38,36,1],[41,13,41,14,1],[42,17,42,47,1],[43,17,43,57,1],[43,58,43,67,1],[46,17,46,45,1],[47,17,47,18,1],[48,21,48,91,1],[49,21,49,39,1],[51,21,51,30,1],[55,17,55,49,1],[56,17,56,18,1],[57,21,57,89,1],[58,21,58,38,1],[59,17,59,18,1],[68,17,68,112,1],[69,17,69,18,1],[70,21,70,37,1],[72,21,72,185,1],[73,21,73,44,1],[74,17,74,18,1],[79,17,79,92,1],[79,93,79,105,1],[82,13,82,14,1],[40,44,40,48,1],[40,20,40,42,1],[83,13,83,26,1],[84,9,84,10,1],[88,9,88,10,1],[89,13,89,30,1],[90,13,90,31,1],[91,13,91,30,1],[92,13,92,30,1],[93,13,93,35,1],[94,13,94,42,1],[95,13,95,88,1],[97,13,97,49,1],[98,13,98,55,1],[99,13,99,52,1],[100,13,100,61,1],[101,13,101,42,1],[102,13,102,96,1],[103,13,103,75,1],[104,13,104,76,1],[109,13,109,20,1],[110,9,110,10,1],[119,9,119,10,1],[120,13,120,49,1],[121,13,121,52,1],[122,9,122,10,1]]);
+    </script>
+  </body>
+</html>

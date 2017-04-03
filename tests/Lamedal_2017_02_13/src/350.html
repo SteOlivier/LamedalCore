@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>d:\dev\lamedal\trunk\lamedalcore\lamedalcore\lib\excel\excel_macro.cs</title>
+    <script type="text/javascript" src="../js/dotcover.sourceview.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/dotcover.report.css" />
+  </head>
+  <body>
+    <pre id="content" class="source-code">
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using LamedalCore.domain.Enumerals;
+using LamedalCore.zPublicClass.ExcelData;
+using LamedalCore.zz;
+//using Xunit;
+
+namespace LamedalCore.lib.Excel
+{
+    public sealed class Excel_Macro
+    {
+        private readonly LamedalCore_ _lamed = LamedalCore_.Instance;
+
+        #region MacroItem
+        /// &lt;summary&gt;
+        /// Gets the MacroItem library methods.
+        /// &lt;/summary&gt;
+        public Excel_MacroItem MacroItem
+        {
+            get { return _MacroItem ?? (_MacroItem = new Excel_MacroItem()); }
+        }
+        private Excel_MacroItem _MacroItem;
+        #endregion
+
+        /// &lt;summary&gt;Execute the macro in the exel file.&lt;/summary&gt;
+        /// &lt;param name=&quot;fileData&quot;&gt;The file data.&lt;/param&gt;
+        /// &lt;param name=&quot;fileConfig&quot;&gt;The file configuration.&lt;/param&gt;
+        /// &lt;param name=&quot;fileOutput&quot;&gt;The file output.&lt;/param&gt;
+        /// &lt;param name=&quot;errorMsg&quot;&gt;The error MSG.&lt;/param&gt;
+        public bool Execute_ExcelMacro(string fileData, string fileConfig, string fileOutput, out string errorMsg)
+        {
+            // Test if input files exists
+            if (_lamed.lib.IO.File.Exists(ref fileData, &quot;.xlsx&quot;) == false) $&quot;Error! &#39;{fileData}&#39; does not exist.&quot;.zException_Show();
+            if (_lamed.lib.IO.File.Exists(ref fileConfig, &quot;.xlsx&quot;) == false) $&quot;Error! &#39;{fileConfig}&#39; does not exist.&quot;.zException_Show();
+            if (fileOutput.Contains(&quot;.xlsx&quot;) == false) fileOutput += &quot;.xlsx&quot;;
+
+            // Copy config file to _Compile
+            var fileCompile = fileConfig.Replace(&quot;.xlsx&quot;, &quot;_Compile.xlsx&quot;);
+            _lamed.lib.IO.File.Copy(fileConfig, fileCompile, true);
+
+            // Read the two excel files
+            pcExcelData_ excelConfig = _lamed.lib.Excel.IO_Read.ExcelFile_LoadAsExcelData(fileCompile);
+            pcExcelData_ excelData = _lamed.lib.Excel.IO_Read.ExcelFile_LoadAsExcelData(fileData);
+            //excelData.csvSave2File(@&quot;C:\test\07_RDI_BudgetAdjusted.csv&quot;);
+
+            // Compile the refeneces
+            _lamed.lib.Excel.Macro.Compile(excelConfig, out errorMsg); // Get the reference
+            _lamed.lib.Excel.Macro.ExcelFile_Merge(fileCompile, excelConfig, enExcel_MergeType.ExecuteMacro);
+            _lamed.lib.IO.File.Copy(fileCompile, fileOutput, true);
+            if (errorMsg.Trim() != &quot;&quot;) return false;  // &lt;================================================[ Unit test required for this
+
+            // Merge the final values
+            _lamed.lib.Excel.Macro.Execute_Data(excelData, excelConfig); // Get the data of the references
+            //excelData.csvSave2File(@&quot;C:\test\Budget_Dashboard.csv&quot;);
+            _lamed.lib.Excel.Macro.ExcelFile_Merge(fileOutput, excelData, enExcel_MergeType.InsertReferences);
+            return true;
+        }
+
+        /// &lt;summary&gt;Reads the excel file using Open XML SDK.&lt;/summary&gt;
+        /// &lt;param name=&quot;fileResult&quot;&gt;Name of the file.&lt;/param&gt;
+        /// &lt;param name=&quot;sourceData&quot;&gt;The data.&lt;/param&gt;
+        /// &lt;param name=&quot;mergeType&quot;&gt;Type of the merge.&lt;/param&gt;
+        /// &lt;param name=&quot;sheetName&quot;&gt;Name of the sheet.&lt;/param&gt;
+        /// &lt;param name=&quot;startAddress&quot;&gt;If specifed, use this as the start address line for merge operations.&lt;/param&gt;
+        public void ExcelFile_Merge(string fileResult, pcExcelData_ sourceData, enExcel_MergeType mergeType, string sheetName = &quot;&quot;, string startAddress = &quot;&quot;)
+        {
+            using (FileStream fileStream = new FileStream(fileResult, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+            {
+                using (var spreadsheetDocument = SpreadsheetDocument.Open(fileStream, true))
+                {
+                    //sharedStringTable = null;
+                    WorkbookPart workbookPart = spreadsheetDocument.WorkbookPart;
+
+                    IEnumerable&lt;SharedStringTablePart&gt; sharedStringTableParts = workbookPart.GetPartsOfType&lt;SharedStringTablePart&gt;();
+                    SharedStringTablePart sharedStringTablePart;
+                    if (sharedStringTableParts.Count() &gt; 0)
+                        sharedStringTablePart = sharedStringTableParts.First();
+                    else sharedStringTablePart = spreadsheetDocument.WorkbookPart.AddNewPart&lt;SharedStringTablePart&gt;();  // Unit test needed for this line
+                    SharedStringTable sharedStringTable = sharedStringTablePart.SharedStringTable;
+
+                    //WorksheetPart worksheetPart = workbookPart.WorksheetParts.Last();
+                    WorksheetPart worksheetPart = _lamed.lib.Excel.IO_Read.WorksheetPart_FromName(workbookPart, sheetName);
+                    Worksheet worksheet = worksheetPart.Worksheet;
+
+                    IEnumerable&lt;Row&gt; rows = _lamed.lib.Excel.IO_Read.Rows(worksheet);
+                    Debug.WriteLine(&quot;Row count = {0}&quot;.zFormat(_lamed.lib.Excel.IO_Read.Row_Count(worksheet)));
+
+                    // Extract data rows
+                    #region foreach (Row row in rows)
+
+                    int startRow = -1, col;
+                    if (startAddress != &quot;&quot;) _lamed.lib.Excel.Adress.ColRow_AsInt(out col, out startRow, startAddress);
+                    foreach (Row row in rows)
+                    {
+                        foreach (Cell cell in row.Elements&lt;Cell&gt;())
+                        {
+                            string value = _lamed.lib.Excel.IO_Read.CellValue_AsStr(cell, sharedStringTable);
+                            StringValue ref1 = cell.CellReference;
+                            int rowNo;
+                            _lamed.lib.Excel.Adress.ColRow_AsInt(out col, out rowNo, ref1);
+
+                            //Debug.WriteLine($&quot;Cell ref &#39;{ref1}&#39;: {value}&quot;);
+                            if (startRow != -1 &amp;&amp; startRow != rowNo) continue; //&lt;=======================================[ Skip rows if not applicable
+
+                            // If there is a merge indicator then do the merge
+                            if (mergeType == enExcel_MergeType.ExecuteMacro)
+                            {
+                                if (value.zIn(&quot;|&gt;|&quot;, &quot;|&lt;|&quot;, &quot;|V|&quot;, &quot;|^|&quot;, &quot;|V0|&quot;, &quot;|^0|&quot;))
+                                {
+                                    var newValue = sourceData.Value_Get(ref1);
+                                    _lamed.lib.Excel.IO_Read.ConstructCellValue(cell, newValue);
+                                }
+                            }
+                            else if (mergeType == enExcel_MergeType.InsertReferences &amp;&amp; value.Contains(&quot;|&quot;))
+                            {
+                                var ref2 = value.Replace(&quot;|&quot;, &quot;&quot;);
+                                var newValue = sourceData.Value_Get(ref2);
+                                _lamed.lib.Excel.IO_Read.ConstructCellValue(cell, newValue);
+                            }
+                        }
+                    }
+                    #endregion
+
+                    // Test writing
+                    worksheet.WorksheetPart.Worksheet.Save();
+                    spreadsheetDocument.Close();
+                }
+            }
+        }
+
+        /// &lt;summary&gt;Execute the Macros in the config file.&lt;/summary&gt;
+        /// &lt;param name=&quot;dataSource&quot;&gt;The data source.&lt;/param&gt;
+        /// &lt;param name=&quot;dataConfig&quot;&gt;The data configuration.&lt;/param&gt;
+        public void Execute_Data(pcExcelData_ dataSource, pcExcelData_ dataConfig)
+        {
+            foreach (List&lt;string&gt; row in dataConfig.Rows)
+            {
+                Execute_Row(dataSource, row);
+            }
+        }
+
+        /// &lt;summary&gt;Executes macro on the row.&lt;/summary&gt;
+        /// &lt;param name=&quot;dataSource&quot;&gt;The data source.&lt;/param&gt;
+        /// &lt;param name=&quot;row&quot;&gt;The row.&lt;/param&gt;
+        private void Execute_Row(pcExcelData_ dataSource, List&lt;string&gt; row)
+        {
+            for (int ii = 0; ii &lt; row.Count; ii++)
+            {
+                var value1 = row[ii].Trim();
+                if (value1.Length &lt; 3) continue;  // &lt;=================================================
+
+                if (&quot;|&quot; == value1.Substring(0, 1) &amp;&amp; &quot;|&quot; == value1.Substring(value1.Length - 1, 1))
+                {
+                    value1 = value1.Replace(&quot;|&quot;, &quot;&quot;);
+                    var value2 = dataSource.Value_Get(value1).Trim();
+                    if (value2.Contains(&quot;,&quot;))
+                        value2 = value2.Replace(&quot;,&quot;, &quot;&quot;);
+
+                    row[ii] = value2;
+                }
+            }
+        }
+
+        /// &lt;summary&gt;Execute the macros in the code.&lt;/summary&gt;
+        /// &lt;param name=&quot;data&quot;&gt;The data.&lt;/param&gt;
+        /// &lt;param name=&quot;errorMsg&quot;&gt;The error MSG.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        /// &lt;exception cref=&quot;System.NotImplementedException&quot;&gt;&lt;/exception&gt;
+        public bool Compile(pcExcelData_ data, out string errorMsg)
+        {
+            errorMsg = &quot;&quot;;
+
+            // Loop through all the rows
+            foreach (List&lt;string&gt; row in data.Rows)
+            {
+                string errMsg1;
+                MacroItem.Compile_Row(row, out errMsg1);
+                if (errMsg1 != &quot;&quot;) errorMsg += errMsg1;
+            }
+
+            // Loop through all the cols
+            var columns = data.Columns;
+            var colNo = 0;
+            foreach (List&lt;string&gt; col in columns)
+            {
+                string errMsg1;
+                if (MacroItem.Compile_Column(col, out errMsg1))  // Compile the column values
+                {
+                    // Update the row values because something has changed
+                    var rowNo = 0;
+                    foreach (string value in col)
+                    {
+                        List&lt;string&gt; row = data.Rows[rowNo];
+                        if (row.Count &gt; colNo) row[colNo] = value;
+                        rowNo++;
+                    }
+                }
+                if (errMsg1 != &quot;&quot;) errorMsg += errMsg1;
+                colNo++;
+            }
+
+            // ==============================================
+            // Look for |V&gt;|
+            List&lt;string&gt; addressList = _lamed.lib.Excel.Adress.Find(data, &quot;|V&gt;|&quot;, enExcel_Compare.Equal, enExcel_FindReturnValue.CellAddress);
+            MacroItem.Compile_DownLeftCalculate(data,addressList);
+
+            // ==============================================
+            // |V0|
+            addressList = _lamed.lib.Excel.Adress.Find(data, &quot;|V0|&quot;, enExcel_Compare.Equal, enExcel_FindReturnValue.CellAddress);
+            MacroItem.Compile_Down0Calculate(data, addressList);
+
+            // =============================================
+            // |^0|
+            addressList = _lamed.lib.Excel.Adress.Find(data, &quot;|^0|&quot;, enExcel_Compare.Equal, enExcel_FindReturnValue.CellAddress);
+            MacroItem.Compile_Up0Calculate(data, addressList);
+
+            errorMsg = errorMsg.Trim();
+            if (errorMsg == &quot;&quot;) return true;
+            return false;
+        }
+
+        /// &lt;summary&gt;Test all the References in the sheet.&lt;/summary&gt;
+        /// &lt;param name=&quot;data&quot;&gt;The data.&lt;/param&gt;
+        /// &lt;param name=&quot;resultMsg&quot;&gt;The error MSG.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool DataIntegrity_Check(pcExcelData_ data, out string resultMsg)
+        {
+            var result = true;
+            resultMsg = &quot;&quot;;
+
+            List&lt;string&gt; reflines = _lamed.lib.Excel.Adress.Find(data, &quot;|-&gt;&quot;);  // Search for |??|-&gt; pattern
+            // Parse the pattern &amp; test
+            foreach (string refline in reflines)
+            {
+                if (refline.Contains(&quot;{Sheet}-&gt;&quot;)) continue;  // Skip sheet import definitions
+
+                string cellAddress, cellValue;
+                MacroItem.DataIntegrity_CellParser(refline, out cellAddress, out cellValue);
+                string msg;
+                if (MacroItem.DataIntegrity_Check(data, cellAddress, cellValue, out msg) == false) result = false;
+                if (resultMsg != &quot;&quot;) resultMsg += &quot;&quot;.NL();
+                resultMsg += msg;
+            }
+            return result;
+        }
+
+        /// &lt;summary&gt;Test the Excel data file if it meets the sheets definition.&lt;/summary&gt;
+        /// &lt;param name=&quot;data&quot;&gt;The data.&lt;/param&gt;
+        /// &lt;param name=&quot;sheetDef&quot;&gt;The sheet definition.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public bool DataIntegrity_Check(pcExcelData_ data, pcExcelDef_Sheet sheetDef)
+        {
+            foreach (pcExcelDef_Cell cell in sheetDef.Cells)
+            {
+                var value = data.Value_Get(cell.CellAddress);
+                if (value != cell.CellValue) return false;
+            }
+            return true;
+        }
+
+        /// &lt;summary&gt;Create a Dashboard from Excel input sheets.&lt;/summary&gt;
+        /// &lt;param name=&quot;folder&quot;&gt;The folder.&lt;/param&gt;
+        /// &lt;param name=&quot;dashboardInputFile&quot;&gt;The input excel file.&lt;/param&gt;
+        /// &lt;param name=&quot;dashboardResultFile&quot;&gt;The dashboard result file.&lt;/param&gt;
+        public void Dashboard_FromSheets(string folder, string dashboardInputFile, string dashboardResultFile = &quot;&quot;)
+        {
+            #region Load config file and parse macros ]=======================
+            var fileConfig = folder + dashboardInputFile;
+            if (_lamed.lib.IO.File.Exists(fileConfig) == false) $&quot;Error! File &#39;{fileConfig}&#39; does not exists.&quot;.zException_Show();  // Test input
+            var fileCompile = fileConfig.Replace(&quot;.xlsx&quot;, &quot;_Compile.xlsx&quot;);
+            if (dashboardResultFile == &quot;&quot;) dashboardResultFile = fileConfig.Replace(&quot;.xlsx&quot;, &quot;_Result.xlsx&quot;);
+
+            _lamed.lib.IO.File.Copy(fileConfig, fileCompile, true);  // Copy config file to _Compile
+            pcExcelData_ excelConfig = _lamed.lib.Excel.IO_Read.ExcelFile_LoadAsExcelData(fileCompile);  // Load the file
+
+            // Compile the refeneces
+            string errorMsg;
+            _lamed.lib.Excel.Macro.Compile(excelConfig, out errorMsg); // Get the reference
+            _lamed.lib.Excel.Macro.ExcelFile_Merge(fileCompile, excelConfig, enExcel_MergeType.ExecuteMacro);
+            // ===========================================================================================
+            #endregion
+
+            #region Checks &amp; get input files
+            // ==================================================
+            // Check if &quot;{Sheet}-&gt;&quot; exists
+            // {Sheet}-&gt;&quot;Q22&quot;,{Data}-&gt;|A5|,|A10|-&gt;&quot;Name or Nickname:&quot;,|A14|-&gt;&quot;1&quot;,|A35|-&gt;&quot;22&quot;,|K12|-&gt;&quot;Total&quot;
+            string sheetDefStr;
+            if (excelConfig.Find_First(out sheetDefStr, &quot;{Sheet}-&gt;&quot;) == false)
+                &quot;Error! Unable to find &#39;{Sheet}-&gt;&#39; in Excel sheet&quot;.zException_Show();   // Unit test needed for this line
+            pcExcelDef_Sheet sheetDef = _lamed.lib.Excel.Macro.MacroItem.SheetDef_Parse(sheetDefStr);
+            List&lt;string&gt; filesGood = Dashbaord_FindSheetFiles(folder, sheetDef);  // Get all Excel files from folder that meets search condition
+            #endregion
+
+            #region For all files apply macro references 
+            // ==================================================
+            _lamed.lib.IO.File.Copy(fileCompile, dashboardResultFile, true);
+            var startAddress = sheetDef.DataCellAddress;
+            foreach (string fileData in filesGood)
+            {
+                var dataExcel = _lamed.lib.Excel.IO_Read.ExcelFile_LoadAsExcelData(fileData);
+                _lamed.lib.Excel.Macro.ExcelFile_Merge(dashboardResultFile, dataExcel, enExcel_MergeType.InsertReferences, &quot;&quot;, startAddress);
+                startAddress = _lamed.lib.Excel.Adress.CellAddress_NextRow(startAddress);
+            }
+            #endregion
+        }
+
+        /// &lt;summary&gt;Get all Excel files from folder that meets the sheet definition.&lt;/summary&gt;
+        /// &lt;param name=&quot;folder&quot;&gt;The folder.&lt;/param&gt;
+        /// &lt;param name=&quot;sheetDef&quot;&gt;The sheet definition.&lt;/param&gt;
+        /// &lt;returns&gt;&lt;/returns&gt;
+        public List&lt;string&gt; Dashbaord_FindSheetFiles(string folder, pcExcelDef_Sheet sheetDef)
+        {
+            IEnumerable&lt;string&gt; files = _lamed.lib.IO.Search.Search_Files(folder, &quot;*.xlsx&quot;);
+
+            // Find Excel files that meets conditions
+            var filesGood = new List&lt;string&gt;();
+            foreach (string fileInput in files)
+            {
+                pcExcelData_ dataTest = _lamed.lib.Excel.IO_Read.ExcelFile_LoadAsExcelData(fileInput);
+                if (_lamed.lib.Excel.Macro.DataIntegrity_Check(dataTest, sheetDef)) filesGood.Add(fileInput);
+            }
+            return filesGood;
+        }
+
+    }
+}
+
+    </pre>
+    <script type="text/javascript">
+      highlightRanges([[57,40,57,53,0],[85,26,85,119,0],[164,25,164,58,0],[247,100,247,115,0],[276,65,276,130,0],[296,17,296,86,0],[27,17,27,18,1],[27,19,27,77,1],[27,78,27,79,1],[38,9,38,10,1],[40,13,40,75,1],[40,76,40,133,1],[41,13,41,77,1],[41,78,41,137,1],[42,13,42,55,1],[42,56,42,78,1],[45,13,45,76,1],[46,13,46,68,1],[49,13,49,104,1],[50,13,50,99,1],[54,13,54,71,1],[55,13,55,110,1],[56,13,56,68,1],[57,13,57,39,1],[60,13,60,73,1],[62,13,62,111,1],[63,13,63,25,1],[64,9,64,10,1],[73,9,73,10,1],[74,20,74,128,1],[75,13,75,14,1],[76,24,76,92,1],[77,17,77,18,1],[79,21,79,82,1],[81,21,81,134,1],[83,21,83,60,1],[84,25,84,80,1],[86,21,86,99,1],[89,21,89,124,1],[90,21,90,67,1],[92,21,92,86,1],[93,21,93,111,1],[98,21,98,38,1],[99,21,99,44,1],[99,45,99,119,1],[100,21,100,28,1],[100,41,100,45,1],[100,30,100,37,1],[101,21,101,22,1],[102,25,102,32,1],[102,47,102,67,1],[102,34,102,43,1],[103,25,103,26,1],[104,29,104,110,1],[105,29,105,67,1],[107,29,107,92,1],[110,29,110,69,1],[110,70,110,79,1],[113,29,113,77,1],[114,29,114,30,1],[115,33,115,91,1],[116,33,116,34,1],[117,37,117,79,1],[118,37,118,97,1],[119,33,119,34,1],[120,29,120,30,1],[121,34,121,109,1],[122,29,122,30,1],[123,33,123,67,1],[124,33,124,75,1],[125,33,125,93,1],[126,29,126,30,1],[127,25,127,26,1],[102,44,102,46,1],[128,21,128,22,1],[100,38,100,40,1],[132,21,132,62,1],[133,21,133,49,1],[134,17,134,18,1],[135,13,135,14,1],[136,9,136,10,1],[142,9,142,10,1],[143,13,143,20,1],[143,42,143,57,1],[143,22,143,38,1],[144,13,144,14,1],[145,17,145,46,1],[146,13,146,14,1],[143,39,143,41,1],[147,9,147,10,1],[153,9,153,10,1],[154,18,154,28,1],[155,13,155,14,1],[156,17,156,45,1],[157,17,157,39,1],[157,40,157,49,1],[159,17,159,100,1],[160,17,160,18,1],[161,21,161,54,1],[162,21,162,70,1],[163,21,163,46,1],[166,21,166,38,1],[167,17,167,18,1],[168,13,168,14,1],[154,46,154,50,1],[154,30,154,44,1],[169,9,169,10,1],[177,9,177,10,1],[178,13,178,27,1],[181,13,181,20,1],[181,42,181,51,1],[181,22,181,38,1],[182,13,182,14,1],[184,17,184,57,1],[185,17,185,35,1],[185,36,185,56,1],[186,13,186,14,1],[181,39,181,41,1],[189,13,189,40,1],[190,13,190,27,1],[191,13,191,20,1],[191,42,191,49,1],[191,22,191,38,1],[192,13,192,14,1],[194,17,194,64,1],[195,17,195,18,1],[197,21,197,35,1],[198,21,198,28,1],[198,46,198,49,1],[198,30,198,42,1],[199,21,199,22,1],[200,25,200,61,1],[201,25,201,47,1],[201,48,201,67,1],[202,25,202,33,1],[203,21,203,22,1],[198,43,198,45,1],[204,17,204,18,1],[205,17,205,35,1],[205,36,205,56,1],[206,17,206,25,1],[207,13,207,14,1],[191,39,191,41,1],[211,13,211,143,1],[212,13,212,67,1],[216,13,216,130,1],[217,13,217,65,1],[221,13,221,130,1],[222,13,222,63,1],[224,13,224,40,1],[225,13,225,32,1],[225,33,225,45,1],[226,13,226,26,1],[227,9,227,10,1],[234,9,234,10,1],[235,13,235,31,1],[236,13,236,28,1],[238,13,238,79,1],[240,13,240,20,1],[240,40,240,48,1],[240,22,240,36,1],[241,13,241,14,1],[242,17,242,51,1],[242,52,242,61,1],[245,17,245,93,1],[247,17,247,99,1],[248,17,248,37,1],[248,38,248,59,1],[249,17,249,34,1],[250,13,250,14,1],[240,37,240,39,1],[251,13,251,27,1],[252,9,252,10,1],[259,9,259,10,1],[260,13,260,20,1],[260,46,260,60,1],[260,22,260,42,1],[261,13,261,14,1],[262,17,262,62,1],[263,17,263,45,1],[263,46,263,59,1],[264,13,264,14,1],[260,43,260,45,1],[265,13,265,25,1],[266,9,266,10,1],[273,9,273,10,1],[275,13,275,58,1],[276,13,276,64,1],[277,13,277,76,1],[278,13,278,43,1],[278,44,278,110,1],[280,13,280,68,1],[281,13,281,104,1],[285,13,285,71,1],[286,13,286,110,1],[295,13,295,79,1],[297,13,297,102,1],[298,13,298,81,1],[303,13,303,77,1],[304,13,304,57,1],[305,13,305,20,1],[305,41,305,50,1],[305,22,305,37,1],[306,13,306,14,1],[307,17,307,94,1],[308,17,308,142,1],[309,17,309,90,1],[310,13,310,14,1],[305,38,305,40,1],[312,9,312,10,1],[319,9,319,10,1],[320,13,320,93,1],[323,13,323,48,1],[324,13,324,20,1],[324,42,324,47,1],[324,22,324,38,1],[325,13,325,14,1],[326,17,326,103,1],[327,17,327,84,1],[327,85,327,110,1],[328,13,328,14,1],[324,39,324,41,1],[329,13,329,30,1],[330,9,330,10,1],[19,9,19,70,1]]);
+    </script>
+  </body>
+</html>
