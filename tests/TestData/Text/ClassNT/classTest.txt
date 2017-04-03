@@ -14,7 +14,7 @@
     "Ignore_Namespace3": null,
     "Ignore_Namespace4": null,
     "ShortcutClass": null,
-    "TypeId": "LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttribute.ClassNTBlueprintRule.ClassNTBlueprintRule_, LamedalCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+    "TypeId": "LamedalCore.lib.SolutionNT.ClassNT.ClassNTAttribute.ClassNTBlueprintRule.ClassNTBlueprintRule_, LamedalCore, Version=1.1.4.2, Culture=neutral, PublicKeyToken=null"
   },
   "Header": {
     "NameSpace_Name": "Blueprint.lib.Rules.Types",

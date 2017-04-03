@@ -30,9 +30,9 @@ Please note that the library is still in its starting phases. Radical design cha
 
 ![alt tag](https://github.com/perezLamed/LamedalCore/blob/master/pics/Setup1.png)
 ![alt tag](https://github.com/perezLamed/LamedalCore/blob/master/pics/Setup2.png)
-![alt tag](https://github.com/perezLamed/LamedalCore/blob/master/pics/Setup3.png)
 
-# Code coverage: 
+# Test results & Code coverage: 
+![alt tag](https://github.com/perezLamed/LamedalCore/blob/master/pics/Tests.png)
 ![alt tag](https://github.com/perezLamed/LamedalCore/blob/master/pics/Coverage.png)
 
 #License

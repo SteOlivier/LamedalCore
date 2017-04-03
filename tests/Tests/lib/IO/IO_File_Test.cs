@@ -76,7 +76,7 @@ namespace LamedalCore.Test.Tests.lib.IO
             _lamed.lib.IO.File.Copy(file, testFolder + "file2.txt");
             _lamed.lib.IO.File.Copy(file, testFolder + "file2.txt", true);
             var ex3 = Assert.Throws<IOException>(() =>_lamed.lib.IO.File.Copy(file, testFolder + "file2.txt"));
-            Assert.Equal("The file 'D:/Dev/LaMedal/trunk/LamedalCore/LamedalCore.Test/bin/Debug/TestFolderIO/file2.txt' already exists.", ex3.Message);
+            Assert.Equal(true, ex3.Message.Contains("/bin/Debug/TestFolderIO/file2.txt' already exists."));  // This test is not valid
             _lamed.lib.IO.File.Copy(file, testFolder + "file3.txt");
             _lamed.lib.IO.File.Copy(file, testFolder + "file4.txt");
             Assert.True(_lamed.lib.IO.File.Exists(testFolder + "file4.txt"));
@@ -98,7 +98,7 @@ namespace LamedalCore.Test.Tests.lib.IO
             string folderAndFileFound;
             bool result = _lamed.lib.IO.Search.FileInSubFolders(testFolderList, "file2.txt", out folderAndFileFound);
             Assert.Equal(true, result);
-            Assert.Equal("D:/Dev/LaMedal/trunk/LamedalCore/LamedalCore.Test/bin/Debug/TestFolderIO/file2.txt", folderAndFileFound);
+            Assert.Equal(true, folderAndFileFound.Contains("/bin/Debug/TestFolderIO/file2.txt"));
 
             bool result2 = _lamed.lib.IO.Search.FileInSubFolders(testFolderList, "fileThatWillNotBeFound.txt", out folderAndFileFound);
             Assert.Equal(false, result2);
