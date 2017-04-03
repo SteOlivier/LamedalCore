@@ -164,7 +164,6 @@
     <Compile Include="Tests\Types\Class\Class_Attributes_Data.cs" />
     <Compile Include="Tests\Types\Types_DateTimeSpan_Test.cs" />
     <Compile Include="Tests\zPublicClass\GridBlock_zzTest.cs" />
-    <Compile Include="Tests\_Data\TestData_.cs" />
     <Compile Include="Tests\Types\Types_Enum_Data.cs" />
     <Compile Include="Tests\Types\List\List_Convert_Data.cs" />
     <Compile Include="Tests\Types\List\List_Action_Test.cs" />
