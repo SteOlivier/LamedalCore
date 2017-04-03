@@ -5,7 +5,7 @@
 
 # Background
 -------------------------------------------------------------------------------------
-> The best programmers in the world can deliver software before deadlines, under budget, 
+> <i> The best programmers in the world can deliver software before deadlines, under budget, 
 > and address 100% of the requirements. Sadly there are just too many deadlines and in order 
 > to stay afloat code is copied and pasted all over the place. No time is available to spend 
 > on code quality. There is never time to focus on writing code for one simple specific thing, 
@@ -13,7 +13,7 @@
 > an opportunity to create these "perfect little snowflakes" of code. 
 >
 > The continues pressures of "crunching" out code will ... 
->           (See https://sites.google.com/site/lamedalwiki/ for more details)
+>           (See https://sites.google.com/site/lamedalwiki/ for more details)  </i?
 --------------------------------------------------------------------------------------------
 
 # Roadmap
