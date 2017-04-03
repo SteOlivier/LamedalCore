@@ -1,5 +1,5 @@
 # LamedalCore
-Software done right. Quick start .NET Core library
+Software done right. (This is a library of useful methods implemented on .NET Core that will give you a quick start.)
 
 * Project : https://sites.google.com/site/lamedalwiki/
 * LamedaL Nuget package: https://www.nuget.org/packages/LamedalCore/
@@ -10,7 +10,18 @@ The best programmers in the world can deliver software before deadlines, under b
 
 The continues pressures of "crunching" out code will ... (See https://sites.google.com/site/lamedalwiki/ for more details)
 
+# Roadmap
+* Create a simple but functional .NET Core library. (Done)
+* Create test cases with at least 95% code coverage of the library. (Done) 
+* Create a simple c# code parser to evaluate code on a macro scale. (In progress)
+* Create Visual Studio Tools to support the Lamedal framework. (Future)
+* Use Lamedal tools to refactor and optimise source code. (Future)
+* Publish Lamedal Blueprint rule framework methodology. (Future)
+* Demo's to illustrate how Blueprint tools is used to create Lamedal extensions. (Future)
+
 # Setup
+Please note that the library is still in its starting phases. Radical design changes will occur between versions.
+
 ![alt tag](https://github.com/perezLamed/LamedalCore/blob/master/pics/Setup1.png)
 ![alt tag](https://github.com/perezLamed/LamedalCore/blob/master/pics/Setup2.png)
 ![alt tag](https://github.com/perezLamed/LamedalCore/blob/master/pics/Setup3.png)
