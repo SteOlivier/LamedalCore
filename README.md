@@ -13,7 +13,7 @@
 > an opportunity to create these "perfect little snowflakes" of code. 
 >
 > The continues pressures of "crunching" out code will ... 
->           (See https://sites.google.com/site/lamedalwiki/ for more details)  </i?
+>           (See https://sites.google.com/site/lamedalwiki/ for more details)  </i>
 --------------------------------------------------------------------------------------------
 
 # Roadmap
