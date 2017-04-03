@@ -15,7 +15,7 @@ The continues pressures of "crunching" out code will ... (See https://sites.goog
 ![alt tag](https://github.com/perezLamed/LamedalCore/blob/master/pics/Setup2.png)
 ![alt tag](https://github.com/perezLamed/LamedalCore/blob/master/pics/Setup3.png)
 
-* Code coverage: (https://github.com/perezLamed/LamedalCore/blob/master/tests/Lamedal_2017_02_13.html)
+* Code coverage: [a link](https://github.com/perezLamed/LamedalCore/blob/master/tests/Lamedal_2017_02_13.html)
 
 #License
 Apache License Version 2.0
