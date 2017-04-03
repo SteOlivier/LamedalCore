@@ -1,14 +1,20 @@
 # LamedalCore
-Software done right. (This is a library of useful methods implemented on .NET Core that will give you a quick start.)
-
 * Project : https://sites.google.com/site/lamedalwiki/
-* LamedaL Nuget package: https://www.nuget.org/packages/LamedalCore/
+* Lamedal Nuget package: https://www.nuget.org/packages/LamedalCore/
 * PM> Install-Package LamedalCore
 
-#Background
-The best programmers in the world can deliver software before deadlines, under budget, and address 100% of the requirements. Sadly there are just too many deadlines and in order to stay afloat code is copied and pasted all over the place. No time is available to spend on code quality. There is never time to focus on writing code for one simple specific thing, that do one thing and do that one thing very well. The fact of life is that there is never an opportunity to create these "perfect little snowflakes" of code. 
-
-The continues pressures of "crunching" out code will ... (See https://sites.google.com/site/lamedalwiki/ for more details)
+# Background
+-------------------------------------------------------------------------------------
+> The best programmers in the world can deliver software before deadlines, under budget, 
+> and address 100% of the requirements. Sadly there are just too many deadlines and in order 
+> to stay afloat code is copied and pasted all over the place. No time is available to spend 
+> on code quality. There is never time to focus on writing code for one simple specific thing, 
+> that do one thing and do that one thing very well. The fact of life is that there is never 
+> an opportunity to create these "perfect little snowflakes" of code. 
+>
+> The continues pressures of "crunching" out code will ... 
+>           (See https://sites.google.com/site/lamedalwiki/ for more details)
+--------------------------------------------------------------------------------------------
 
 # Roadmap
 * Create a simple but functional .NET Core library. (Done)
